@@ -1,15 +1,19 @@
 package dev.aurivena.lms.domain.account;
 
-public class Account {
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
+class Account {
     private String email;
     private String login;
     private String username;
-    private String password;
+    private String passwordHash;
 
-    public Account(String email, String login, String username, String password) {
+    public Account(String email, String login, String username, String passwordHash) {
         this.email = email;
         this.login = login;
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
     }
 }
