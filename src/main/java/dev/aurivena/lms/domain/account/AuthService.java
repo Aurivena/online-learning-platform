@@ -40,7 +40,7 @@ public class AuthService {
         RefreshToken refreshTokenEntity = RefreshToken.builder()
                 .account(account)
                 .tokenHash(passwordEncoder.encode(refreshTokenString))
-                .expiration(Instant.now().plusMillis(REFRESH.getValue()))
+                .expiration(Instant.now().plusMillis(REFRESH.getDuration()))
                 .build();
 
         refreshRepository.save(refreshTokenEntity);

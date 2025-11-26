@@ -26,7 +26,7 @@ public class JwtService {
 
 
     public String generate(JwtType jwtType, String email, String role) {
-        long duration = jwtType.getValue();
+        long duration = jwtType.getDuration();
 
         Date expirationDate = new Date(System.currentTimeMillis() + duration);
 
