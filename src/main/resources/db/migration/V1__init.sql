@@ -1,8 +1,10 @@
+CREATE TYPE roles('USER','ADMIN')
+
 CREATE TABLE accounts (
                           id BIGSERIAL PRIMARY KEY,
                           email VARCHAR(255) NOT NULL UNIQUE,
                           password VARCHAR(255) NOT NULL,
-                          role VARCHAR(50) NOT NULL,
+                          role roles NOT NULL,
                           username VARCHAR(125),
                           login VARCHAR(125)
 );
