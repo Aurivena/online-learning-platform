@@ -26,7 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public AuthResponse login(@Valid @RequestBody AuthRequest request) {
+    public TokenPair login(@Valid @RequestBody AuthRequest request) {
         var account = accountRepository.findByEmailOrLogin(request.input(), request.input())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -45,7 +45,7 @@ public class AuthService {
 
         refreshRepository.save(refreshTokenEntity);
 
-        return new AuthResponse(accessToken, refreshTokenString);
+        return new TokenPair(accessToken, refreshTokenString);
     }
 
     public void register(@Valid @RequestBody Account account) {
