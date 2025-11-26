@@ -1,12 +1,16 @@
-package dev.aurivena.lms.domain.jwt;
+package dev.aurivena.lms.common.security;
 
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import dev.aurivena.lms.domain.account.JwtType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+
+import static dev.aurivena.lms.domain.account.JwtType.ACCESS;
+import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 
 @Service
 public class JwtService {
@@ -14,30 +18,24 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    private static final long ACCESS_TOKEN_VALIDITY = 15 * 60 * 1000;
 
-    private static final long REFRESH_TOKEN_VALIDITY = 7L * 24 * 60 * 60 * 1000;
 
     private Algorithm getAlgorithm() {
         return Algorithm.HMAC256(secret);
     }
 
-    public String get(JwtType jwtType, String email, String role) {
-        long duration = switch (jwtType) {
-            case ACCESS -> ACCESS_TOKEN_VALIDITY;
-            case REFRESH -> REFRESH_TOKEN_VALIDITY;
-        };
 
-        return generateToken(duration, email, role);
-    }
+    public String generate(JwtType jwtType, String email, String role) {
+        long duration = jwtType.getValue();
 
-    private String generateToken(long duration, String email, String role) {
+        Date expirationDate = new Date(System.currentTimeMillis() + duration);
+
         return JWT.create()
                 .withSubject("User Details")
                 .withClaim("email", email)
                 .withClaim("role", role)
                 .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + duration))
+                .withExpiresAt(expirationDate)
                 .withIssuer("aurivena-lms")
                 .sign(getAlgorithm());
     }

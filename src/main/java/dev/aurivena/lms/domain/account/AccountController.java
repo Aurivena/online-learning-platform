@@ -1,6 +1,7 @@
 package dev.aurivena.lms.domain.account;
 
-import dev.aurivena.lms.domain.account.dto.AccountResponse;
+import dev.aurivena.lms.domain.account.dto.AuthRequest;
+import dev.aurivena.lms.domain.account.dto.AuthResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ public class AccountController {
 
     @PostMapping("/login")
     @SecurityRequirements()
-    public AccountResponse login(final Account account) {
-        return authService.login(account);
+    public AuthResponse login(final AuthRequest request) {
+        return authService.login(request);
     }
 }
