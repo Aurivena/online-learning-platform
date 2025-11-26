@@ -25,7 +25,7 @@ class Account {
     @Column(nullable = false)
     private String username;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
