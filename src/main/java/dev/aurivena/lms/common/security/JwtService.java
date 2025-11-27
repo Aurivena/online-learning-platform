@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static dev.aurivena.lms.domain.account.JwtType.ACCESS;
-import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 
 @Service
 public class JwtService {
