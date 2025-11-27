@@ -14,11 +14,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 
@@ -28,12 +29,6 @@ import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 @RequiredArgsConstructor
 public class AccountController {
     private final AuthService authService;
-
-    @PostMapping(value = "/register", produces = "application/json")
-    @SecurityRequirements()
-    public void registerAccount(@Valid @RequestBody RegistrationRequest request) {
-        authService.register(request);
-    }
 
     @Operation(
             summary = "Вход в систему",
@@ -47,18 +42,56 @@ public class AccountController {
     @PostMapping(value = "/login", produces = "application/json")
     @SecurityRequirements()
     public dev.aurivena.lms.common.api.ApiResponse<AuthResponse> login(@Valid @RequestBody AuthRequest request, HttpServletResponse response) {
-        TokenPair tokens = authService.login(request);
+        try {
+            TokenPair tokens = authService.login(request);
 
-        AuthResponse body = new AuthResponse(tokens.accessToken());
+            AuthResponse body = new AuthResponse(tokens.accessToken());
 
-        Cookie cookie = new Cookie("refresh_token", tokens.refreshToken());
+            setCookie(response, tokens.refreshToken());
+
+            return dev.aurivena.lms.common.api.ApiResponse.success(body);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @Operation(
+            summary = "Регистрация в системе",
+            description = "Возвращает Access Token в теле и устанавливает Refresh Token в HttpOnly Cookie"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Аккаунт успешно создан"),
+            @ApiResponse(responseCode = "400", description = "Ошибка валидации или неверные данные",
+                    content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
+    })
+    @PostMapping(value = "/register", produces = "application/json")
+    @SecurityRequirements()
+    public dev.aurivena.lms.common.api.ApiResponse<AuthResponse> registerAccount(@Valid @RequestBody RegistrationRequest request, HttpServletResponse response) {
+        try {
+            authService.register(request);
+            AuthRequest authRequest = new AuthRequest(request.email(), request.password());
+            TokenPair tokens = authService.login(authRequest);
+
+            AuthResponse body = new AuthResponse(tokens.accessToken());
+
+            setCookie(response, tokens.refreshToken());
+
+            return dev.aurivena.lms.common.api.ApiResponse.success(body);
+        } catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+
+    private void setCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refresh_token", refreshToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/api/auth/refresh");
         cookie.setMaxAge((int) REFRESH.getDuration() / 1000);
 
         response.addCookie(cookie);
-
-        return dev.aurivena.lms.common.api.ApiResponse.success(body);
     }
 }
