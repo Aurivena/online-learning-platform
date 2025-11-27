@@ -2,6 +2,7 @@ package dev.aurivena.lms.domain.account;
 
 import dev.aurivena.lms.common.security.JwtService;
 import dev.aurivena.lms.domain.account.dto.AuthRequest;
+import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,6 @@ public class AuthService {
         return new TokenPair(accessToken, refreshTokenString);
     }
 
-    public void register(@Valid @RequestBody Account account) {
+    public void register(@Valid @RequestBody RegistrationRequest request) {
     }
 }
