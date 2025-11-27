@@ -29,6 +29,8 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("org.postgresql:postgresql")
     implementation("org.mapstruct:mapstruct:1.6.3")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:3.0.0")
+    implementation("com.auth0:java-jwt:4.5.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

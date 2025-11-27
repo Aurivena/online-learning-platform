@@ -1,19 +1,42 @@
 package dev.aurivena.lms.domain.account;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "accounts")
 @Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false, unique = true)
     private String login;
+
+    @Column(nullable = false)
     private String username;
+
+    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    public Account(String email, String login, String username, String passwordHash) {
-        this.email = email;
-        this.login = login;
-        this.username = username;
-        this.passwordHash = passwordHash;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 }

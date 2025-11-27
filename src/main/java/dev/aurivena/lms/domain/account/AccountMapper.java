@@ -1,6 +1,6 @@
 package dev.aurivena.lms.domain.account;
 
-import dev.aurivena.lms.domain.account.dto.AccountResponse;
+import dev.aurivena.lms.domain.account.dto.AuthResponse;
 import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
 import dev.aurivena.lms.domain.account.dto.UpdateProfileRequest;
 import org.mapstruct.*;
@@ -9,7 +9,7 @@ import org.mapstruct.*;
 interface AccountMapper {
 
     //Entity -> DTO
-    AccountResponse toResponse(Account account);
+    AuthResponse toResponse(Account account);
 
     //Registration -> Entity
     @Mapping(target = "id", ignore = true)
