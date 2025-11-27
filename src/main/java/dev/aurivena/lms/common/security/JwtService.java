@@ -20,7 +20,6 @@ public class JwtService {
     private String secret;
 
 
-
     private Algorithm getAlgorithm() {
         return Algorithm.HMAC256(secret);
     }
