@@ -29,7 +29,7 @@ import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 public class AccountController {
     private final AuthService authService;
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", produces = "application/json")
     @SecurityRequirements()
     public void registerAccount(@Valid @RequestBody RegistrationRequest request) {
         authService.register(request);
@@ -44,7 +44,7 @@ public class AccountController {
             @ApiResponse(responseCode = "400", description = "Ошибка валидации или неверные данные",
                     content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
     })
-    @PostMapping("/login")
+    @PostMapping(value = "/login", produces = "application/json")
     @SecurityRequirements()
     public dev.aurivena.lms.common.api.ApiResponse<AuthResponse> login(@Valid @RequestBody AuthRequest request, HttpServletResponse response) {
         TokenPair tokens = authService.login(request);
