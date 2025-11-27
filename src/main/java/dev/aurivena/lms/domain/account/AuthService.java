@@ -25,7 +25,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public TokenPair login(@Valid @RequestBody AuthRequest request) {
+    public TokenPair login(AuthRequest request) {
         var account = accountRepository.findByEmailOrLogin(request.input(), request.input())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -47,6 +47,19 @@ public class AuthService {
         return new TokenPair(accessToken, refreshTokenString);
     }
 
-    public void register(@Valid @RequestBody RegistrationRequest request) {
+    @Transactional
+    public void register(RegistrationRequest request) {
+        if (accountRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("Email already exists");
+        }
+        if (accountRepository.existsByLogin(request.login())) {
+            throw new RuntimeException("Login already exists");
+        }
+
+        Account account = accountMapper.toEntity(request);
+
+        account.setPasswordHash(passwordEncoder.encode(request.password()));
+
+        accountRepository.save(account);
     }
 }
