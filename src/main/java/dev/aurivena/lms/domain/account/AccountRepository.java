@@ -8,5 +8,6 @@ interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByEmailOrLogin(String email, String login);
 
     boolean existsByEmail(String email);
+
     boolean existsByLogin(String login);
 }

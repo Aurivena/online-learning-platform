@@ -1,8 +1,8 @@
 package dev.aurivena.lms.domain.account;
 
 import dev.aurivena.lms.common.security.JwtService;
-import dev.aurivena.lms.domain.account.dto.AuthResponse;
 import dev.aurivena.lms.domain.account.dto.AuthRequest;
+import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import static dev.aurivena.lms.domain.account.JwtType.ACCESS;
 import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
@@ -48,6 +47,6 @@ public class AuthService {
         return new TokenPair(accessToken, refreshTokenString);
     }
 
-    public void register(@Valid @RequestBody Account account) {
+    public void register(@Valid @RequestBody RegistrationRequest request) {
     }
 }
