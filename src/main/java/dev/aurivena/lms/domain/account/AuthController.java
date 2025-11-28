@@ -1,6 +1,5 @@
 package dev.aurivena.lms.domain.account;
 
-import dev.aurivena.lms.domain.account.dto.AccountResponse;
 import dev.aurivena.lms.domain.account.dto.AuthRequest;
 import dev.aurivena.lms.domain.account.dto.AuthResponse;
 import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
@@ -15,7 +14,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +26,7 @@ import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 @Tag(name = "Auth", description = "Авторизация и регистрация")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+    private final AccountService authService;
 
     @Operation(
             summary = "Вход в систему",
