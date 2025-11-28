@@ -17,7 +17,7 @@ CREATE TABLE refresh_tokens
     token_hash VARCHAR(255) NOT NULL,
     account_id BIGINT       NOT NULL,
     expiration timestamp    NOT NULL,
-    created    timestamp    NOT NULL,
+    created_at timestamp    NOT NULL,
 
     CONSTRAINT fk_refresh_token_to_account_0
         FOREIGN KEY (account_id)
@@ -28,11 +28,11 @@ CREATE TABLE refresh_tokens
 CREATE TABLE organizations
 (
     id          BIGSERIAL PRIMARY KEY,
-    title        VARCHAR(125) NOT NULL,
+    title       VARCHAR(125) NOT NULL,
     tag         VARCHAR(15)  NOT NULL UNIQUE,
     description text         NOT NULL,
-    owner_id    BIGINT NOT NULL,
-    created_at     timestamp default now()
+    owner_id    BIGINT       NOT NULL,
+    created_at  timestamp default now()
 );
 
 

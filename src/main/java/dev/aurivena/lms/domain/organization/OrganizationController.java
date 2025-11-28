@@ -27,8 +27,13 @@ public class OrganizationController {
 
     @Operation(summary = "Поиск организаций")
     @GetMapping(produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<Page<OrganizationResponse>> search(@RequestParam(required = false) String login, @RequestParam(required = false) String tag, @ParameterObject Pageable pageable
-    ) {
+    public dev.aurivena.lms.common.api.ApiResponse<Page<OrganizationResponse>> search(@RequestParam(required = false) String login, @RequestParam(required = false) String tag, @ParameterObject Pageable pageable) {
         return dev.aurivena.lms.common.api.ApiResponse.success(organizationService.search(login, tag, pageable));
+    }
+
+    @Operation(summary = "Информация о организации по ее тегу")
+    @GetMapping(value = "/{tag}", produces = "application/json")
+    public dev.aurivena.lms.common.api.ApiResponse<OrganizationResponse> getByTag(@PathVariable String tag) {
+        return dev.aurivena.lms.common.api.ApiResponse.success(organizationService.getByTag(tag));
     }
 }

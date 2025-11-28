@@ -29,10 +29,10 @@ class RefreshToken {
     private Instant expiration;
 
     @Column(nullable = false, updatable = false)
-    private Instant created;
+    private Instant createdAt;
 
     @PrePersist
     protected void onCreate() {
-        this.created = Instant.now();
+        this.createdAt = Instant.now();
     }
 }

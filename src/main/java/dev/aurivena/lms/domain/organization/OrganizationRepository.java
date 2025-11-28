@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.Optional;
+
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
     @Query("""
                 SELECT o FROM Organization o 
@@ -14,4 +16,6 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
                 AND (:tag IS NULL OR o.tag = :tag) 
             """)
     Page<Organization> search(String login, String tag, Pageable pageable);
+
+    Optional<Organization> findByTag(String tag);
 }
