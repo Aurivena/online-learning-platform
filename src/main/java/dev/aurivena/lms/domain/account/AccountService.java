@@ -1,7 +1,6 @@
 package dev.aurivena.lms.domain.account;
 
 import dev.aurivena.lms.common.security.JwtService;
-import dev.aurivena.lms.domain.account.dto.AccountResponse;
 import dev.aurivena.lms.domain.account.dto.AuthRequest;
 import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
 import jakarta.transaction.Transactional;
@@ -17,7 +16,7 @@ import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AccountService {
     private final AccountMapper accountMapper;
     private final JwtService jwtService;
     private final RefreshRepository refreshRepository;
@@ -64,9 +63,9 @@ public class AuthService {
     }
 
     @Transactional
-    public AccountResponse getAccountByEmail(String email) {
-        if  (accountRepository.existsByEmail(email)) {
-            return accountMapper.toResponse(accountRepository.findByEmailIgnoreCase(email).get());
+    public Account getAccountByEmail(String email) {
+        if (accountRepository.existsByEmail(email)) {
+            return accountRepository.findByEmailIgnoreCase(email).get();
         }
         return null;
     }

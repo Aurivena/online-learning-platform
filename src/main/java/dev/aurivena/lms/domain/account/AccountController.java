@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Account", description = "Работа с пользователем")
 @RequiredArgsConstructor
 public class AccountController {
-    private final AuthService authService;
+    private final AccountService authService;
+    private final AccountMapper accountMapper;
 
     @Operation(
             summary = "Данные о пользователе",
@@ -31,11 +32,12 @@ public class AccountController {
     })
     @GetMapping(value = "/me", produces = "application/json")
     public dev.aurivena.lms.common.api.ApiResponse<AccountResponse> getAccount(@AuthenticationPrincipal String email) {
-        AccountResponse body = authService.getAccountByEmail(email);
+        AccountResponse body = accountMapper.toResponse(authService.getAccountByEmail(email));
 
         if (body == null) {
             return dev.aurivena.lms.common.api.ApiResponse.fail("404");
         }
+
         return dev.aurivena.lms.common.api.ApiResponse.success(body);
     }
 }
