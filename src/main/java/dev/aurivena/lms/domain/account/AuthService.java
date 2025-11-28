@@ -6,6 +6,7 @@ import dev.aurivena.lms.domain.account.dto.AuthRequest;
 import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,10 +27,10 @@ public class AuthService {
     @Transactional
     public TokenPair login(AuthRequest request) {
         var account = accountRepository.findByEmailOrLogin(request.input(), request.input())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new BadCredentialsException("User not found"));
 
         if (!passwordEncoder.matches(request.password(), account.getPasswordHash())) {
-            throw new RuntimeException("Invalid password");
+            throw new BadCredentialsException("Invalid password");
         }
 
         String accessToken = jwtService.generate(ACCESS, account.getEmail(), account.getRole().name());
@@ -49,10 +50,10 @@ public class AuthService {
     @Transactional
     public void register(RegistrationRequest request) {
         if (accountRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already exists");
+            throw new BadCredentialsException("Email already exists");
         }
         if (accountRepository.existsByLogin(request.login())) {
-            throw new RuntimeException("Login already exists");
+            throw new BadCredentialsException("Login already exists");
         }
 
         Account account = accountMapper.toEntity(request);
