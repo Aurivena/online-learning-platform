@@ -28,11 +28,11 @@ CREATE TABLE refresh_tokens
 CREATE TABLE organizations
 (
     id          BIGSERIAL PRIMARY KEY,
-    title        VARCHAR(125) NOT NULL,
+    title       VARCHAR(125) NOT NULL,
     tag         VARCHAR(15)  NOT NULL UNIQUE,
     description text         NOT NULL,
-    owner_id    BIGINT NOT NULL,
-    created_at     timestamp default now()
+    owner_id    BIGINT       NOT NULL,
+    created_at  timestamp default now()
 );
 
 
