@@ -84,6 +84,26 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Выход из системы",
+            description = "Удаляет refresh token"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Refresh token стерт из браузера",
+                    content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
+    })
+    @PostMapping(value = "/logout", produces = "application/json")
+    public void logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refresh_token", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/api/auth/refresh");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+
+        //TODO реализовать, чтобы удалялось из бд
+    }
+
     private void setCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refresh_token", refreshToken);
         cookie.setHttpOnly(true);

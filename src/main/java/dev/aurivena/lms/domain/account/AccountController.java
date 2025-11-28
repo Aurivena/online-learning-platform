@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,9 +25,9 @@ public class AccountController {
             description = "Возвращает данные о пользователе по его email"
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",description = "Получение данных"),
+            @ApiResponse(responseCode = "200", description = "Получение данных"),
             @ApiResponse(responseCode = "404", description = "Такого пользователя не существует",
-            content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
+                    content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
     })
     @GetMapping(value = "/me", produces = "application/json")
     public dev.aurivena.lms.common.api.ApiResponse<AccountResponse> getAccount(@AuthenticationPrincipal String email) {
@@ -37,7 +36,6 @@ public class AccountController {
         if (body == null) {
             return dev.aurivena.lms.common.api.ApiResponse.fail("404");
         }
-
         return dev.aurivena.lms.common.api.ApiResponse.success(body);
     }
 }
