@@ -74,7 +74,7 @@ CREATE TABLE enrollment
     account_id       BIGINT,
     course_id        BIGINT,
     completed        boolean   default false,
-    current_slide_id BIGINT    default 1,
+    current_slide_id BIGINT    default null,
     start_date       timestamp default now(),
 
     CONSTRAINT fk_enrollment_account_id
