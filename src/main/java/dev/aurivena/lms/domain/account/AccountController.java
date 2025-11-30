@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/account")
 @Tag(name = "Account", description = "Работа с пользователем")
 @RequiredArgsConstructor
-public class AccountController {
+class AccountController {
     private final AccountService authService;
     private final AccountMapper accountMapper;
 

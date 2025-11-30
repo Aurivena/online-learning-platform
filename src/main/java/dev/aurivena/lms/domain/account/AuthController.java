@@ -25,7 +25,7 @@ import static dev.aurivena.lms.domain.account.JwtType.REFRESH;
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "Авторизация и регистрация")
 @RequiredArgsConstructor
-public class AuthController {
+class AuthController {
     private final AccountService authService;
 
     @Operation(

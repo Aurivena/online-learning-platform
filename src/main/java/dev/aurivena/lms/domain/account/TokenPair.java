@@ -1,6 +1,6 @@
 package dev.aurivena.lms.domain.account;
 
-public record TokenPair(
+record TokenPair(
         String accessToken,
         String refreshToken
 ) {
