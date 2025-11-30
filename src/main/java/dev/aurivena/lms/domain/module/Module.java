@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -28,7 +29,7 @@ public class Module {
             joinColumns = @JoinColumn(name = "module_id"),
             inverseJoinColumns = @JoinColumn(name = "slide_id")
     )
-    private List<Slide> slides;
+    private List<Slide> slides = new ArrayList<>();
 
     @Column(updatable = false)
     private Instant createdAt;

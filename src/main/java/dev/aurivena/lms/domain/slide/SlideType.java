@@ -1,6 +1,6 @@
 package dev.aurivena.lms.domain.slide;
 
-enum SlideType {
+public enum SlideType {
     TEXT,
     VIDEO,
     TEST

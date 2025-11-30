@@ -6,7 +6,9 @@ import dev.aurivena.lms.domain.module.Module;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.text.DecimalFormat;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,7 +29,7 @@ public class Course {
     @Column(nullable = false)
     private String description;
 
-    private double price;
+    private DecimalFormat price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner", nullable = false)
@@ -39,7 +41,7 @@ public class Course {
             joinColumns = @JoinColumn(name = "course_id"),
             inverseJoinColumns = @JoinColumn(name = "module_id")
     )
-    private List<Module> modules;
+    private List<Module> modules = new ArrayList<>();
 
     @Column(updatable = false)
     private Instant createdAt;
