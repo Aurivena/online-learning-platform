@@ -1,7 +1,6 @@
 package dev.aurivena.lms.domain.organization;
 
 import dev.aurivena.lms.domain.account.Account;
-import dev.aurivena.lms.domain.account.AccountMapper;
 import dev.aurivena.lms.domain.account.AccountService;
 import dev.aurivena.lms.domain.organization.dto.CreateOrganizationRequest;
 import dev.aurivena.lms.domain.organization.dto.OrganizationResponse;
@@ -19,7 +18,6 @@ public class OrganizationService {
     private final OrganizationMapper organizationMapper;
 
     private final AccountService accountService;
-    private final AccountMapper accountMapper;
 
     @Transactional
     public OrganizationResponse create(CreateOrganizationRequest createOrganizationRequest,String ownerEmail) {
