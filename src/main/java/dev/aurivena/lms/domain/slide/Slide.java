@@ -9,7 +9,7 @@ import org.hibernate.type.SqlTypes;
 import java.time.Instant;
 
 @Entity
-@Table(name = "slide")
+@Table(name = "slides")
 @Getter
 @Setter
 @NoArgsConstructor

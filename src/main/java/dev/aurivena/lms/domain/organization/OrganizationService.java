@@ -33,4 +33,12 @@ public class OrganizationService {
     public Page<OrganizationResponse> search(String login, String tag, Pageable pageable) {
         return organizationRepository.search(login, tag, pageable).map(organizationMapper::toResponse);
     }
+
+    @Transactional()
+    public OrganizationResponse getByTag(String tag) {
+        Organization organization = organizationRepository.findByTag(tag)
+                .orElseThrow(()-> new RuntimeException("Organization not found"));
+        return organizationMapper.toResponse(organization);
+
+    }
 }

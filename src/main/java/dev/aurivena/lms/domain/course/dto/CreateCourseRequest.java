@@ -1,12 +1,14 @@
 package dev.aurivena.lms.domain.course.dto;
 
-import java.text.DecimalFormat;
+import dev.aurivena.lms.domain.module.ModuleSlide;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public record CreateCourseRequest(
         String title,
         String description,
-        DecimalFormat price,
-        List<Module> modules
+        BigDecimal price,
+        List<ModuleSlide> modules
 ) {
 }

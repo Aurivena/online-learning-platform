@@ -1,9 +1,12 @@
 package dev.aurivena.lms.domain.course;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-interface CourseRepository extends JpaRepository<Course, Long> {
+public interface CourseRepository extends JpaRepository<Course, Long> {
     Optional<Course> findById(Long id);
+
+    List<Course> findAllByOrganizationId(Long organizationId);
 }

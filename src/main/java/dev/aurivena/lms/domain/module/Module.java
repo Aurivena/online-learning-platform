@@ -1,6 +1,5 @@
 package dev.aurivena.lms.domain.module;
 
-import dev.aurivena.lms.domain.slide.Slide;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,13 +22,10 @@ public class Module {
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "module_slides",
-            joinColumns = @JoinColumn(name = "module_id"),
-            inverseJoinColumns = @JoinColumn(name = "slide_id")
-    )
-    private List<Slide> slides = new ArrayList<>();
+    @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("index ASC")
+    @Builder.Default
+    private List<ModuleSlide> slides = new ArrayList<>();
 
     @Column(updatable = false)
     private Instant createdAt;

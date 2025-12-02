@@ -2,11 +2,11 @@ package dev.aurivena.lms.domain.course;
 
 
 import dev.aurivena.lms.domain.account.Account;
-import dev.aurivena.lms.domain.module.Module;
+import dev.aurivena.lms.domain.organization.Organization;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.text.DecimalFormat;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-class Course {
+public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,19 +29,20 @@ class Course {
     @Column(nullable = false)
     private String description;
 
-    private DecimalFormat price;
+    private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner", nullable = false)
     private Account owner;
 
-    @OneToMany
-    @JoinTable(
-            name = "course_modules",
-            joinColumns = @JoinColumn(name = "course_id"),
-            inverseJoinColumns = @JoinColumn(name = "module_id")
-    )
-    private List<Module> modules = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("index ASC")
+    @Builder.Default
+    private List<CourseModule> modules = new ArrayList<>();
 
     @Column(updatable = false)
     private Instant createdAt;

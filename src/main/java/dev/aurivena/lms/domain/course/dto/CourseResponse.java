@@ -1,15 +1,15 @@
 package dev.aurivena.lms.domain.course.dto;
 
-import dev.aurivena.lms.domain.account.Account;
+import dev.aurivena.lms.domain.module.dto.ModuleResponse;
 
-import java.text.DecimalFormat;
+import java.math.BigDecimal;
 import java.util.List;
 
 public record CourseResponse(
+        Long id,
         String title,
         String description,
-        DecimalFormat price,
-        List<Module> modules,
-        Account owner
+        BigDecimal price,
+        List<ModuleResponse> modules
 ) {
 }

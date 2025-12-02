@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-class Organization {
+public class Organization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

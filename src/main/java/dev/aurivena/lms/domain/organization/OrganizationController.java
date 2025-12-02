@@ -31,4 +31,10 @@ public class OrganizationController {
     ) {
         return dev.aurivena.lms.common.api.ApiResponse.success(organizationService.search(login, tag, pageable));
     }
+
+    @Operation(summary = "Получить организацию по тегу")
+    @GetMapping("/{tag}")
+    public dev.aurivena.lms.common.api.ApiResponse<OrganizationResponse> getByTag(@PathVariable String tag) {
+        return dev.aurivena.lms.common.api.ApiResponse.success(organizationService.getByTag(tag));
+    }
 }
