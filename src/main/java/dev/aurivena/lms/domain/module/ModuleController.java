@@ -15,8 +15,8 @@ class ModuleController {
 
 
     @PostMapping(produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<ModuleResponse> create(@RequestBody CreateModuleRequest request) {
-        return dev.aurivena.lms.common.api.ApiResponse.success(moduleService.create(request));
+    public dev.aurivena.lms.common.api.ApiResponse<ModuleResponse> create(@RequestBody CreateModuleRequest request, @PathVariable Long courseId) {
+        return dev.aurivena.lms.common.api.ApiResponse.success(moduleService.create(request, courseId));
     }
 
     @GetMapping(value = "/{moduleId}", produces = "application/json")

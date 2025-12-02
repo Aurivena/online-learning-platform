@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Slide", description = "Работа со слайдами модуля")
 @RequiredArgsConstructor
 class SlideController {
-    private SlideService slideService;
+    private final SlideService slideService;
 
 
     @PostMapping(produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<SlideResponse> create(@RequestBody CreateSlideRequest request) {
-        return dev.aurivena.lms.common.api.ApiResponse.success(slideService.create(request));
+    public dev.aurivena.lms.common.api.ApiResponse<SlideResponse> create(@RequestBody CreateSlideRequest request, @PathVariable long moduleId) {
+        return dev.aurivena.lms.common.api.ApiResponse.success(slideService.create(request, moduleId));
     }
 
     @GetMapping(value = "/{slideId}", produces = "application/json")

@@ -3,7 +3,9 @@ package dev.aurivena.lms.domain.slide;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
@@ -26,7 +28,7 @@ public class Slide {
     private String description;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private SlideType slideType;
 
     @JdbcTypeCode(SqlTypes.JSON)

@@ -3,7 +3,6 @@ package dev.aurivena.lms.domain.module;
 import dev.aurivena.lms.domain.course.Course;
 import dev.aurivena.lms.domain.course.CourseModule;
 import dev.aurivena.lms.domain.course.CourseRepository;
-import dev.aurivena.lms.domain.course.CourseService;
 import dev.aurivena.lms.domain.module.dto.CreateModuleRequest;
 import dev.aurivena.lms.domain.module.dto.ModuleResponse;
 import jakarta.transaction.Transactional;
@@ -18,8 +17,17 @@ class ModuleService {
     private final CourseRepository courseRepository;
 
     @Transactional
-    public ModuleResponse create(CreateModuleRequest request) {
-        return moduleMapper.toResponse(moduleRepository.save(moduleMapper.toEntity(request)));
+    public ModuleResponse create(CreateModuleRequest request, Long courseId) {
+        Module module = moduleRepository.save(moduleMapper.toEntity(request));
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("course not found"));
+        CourseModule link = CourseModule.create(course, module, course.getModules().size() + 1);
+
+        course.getModules().add(link);
+
+        courseRepository.save(course);
+
+        return moduleMapper.toResponse(module);
     }
 
 
