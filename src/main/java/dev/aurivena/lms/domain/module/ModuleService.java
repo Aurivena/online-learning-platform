@@ -82,6 +82,7 @@ class ModuleService {
         moduleRepository.deleteById(moduleId);
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Transactional
     public void reorder(Long courseId, List<Long> newOrderIds) {
         Course course = courseRepository.findById(courseId)

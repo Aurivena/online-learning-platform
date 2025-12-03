@@ -83,6 +83,7 @@ class SlideService {
                 .orElseThrow(() -> new RuntimeException("Slide not found in this module"));
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Transactional
     public void reorder(long moduleId, List<Long> newOrderIds) {
         Module module = moduleRepository.findById(moduleId)
