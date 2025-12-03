@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/courses/{courseId}/modules")
 @Tag(name = "Module", description = "Работа с модулями курса")
@@ -29,12 +31,18 @@ class ModuleController {
 
     @PutMapping("/{moduleId}")
     public Spond<ModuleResponse> update(@RequestBody UpdateModuleRequest request, @PathVariable long moduleId, @PathVariable Long courseId) {
-        return Spond.success(moduleService.update(request,moduleId,courseId));
+        return Spond.success(moduleService.update(request, moduleId, courseId));
     }
 
     @DeleteMapping("/{moduleId}")
-    public Spond<Void> delete(@PathVariable long moduleId, @PathVariable Long courseId,@AuthenticationPrincipal String ownerEmail) {
+    public Spond<Void> delete(@PathVariable long moduleId, @PathVariable Long courseId, @AuthenticationPrincipal String ownerEmail) {
         moduleService.delete(moduleId, courseId, ownerEmail);
+        return Spond.success(null);
+    }
+
+    @PutMapping("/reorder")
+    public Spond<Void> reorder(@PathVariable Long courseId, @RequestBody List<Long> newOrderIds) {
+        moduleService.reorder(courseId, newOrderIds);
         return Spond.success(null);
     }
 }

@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -75,6 +77,32 @@ class SlideService {
         Module module = moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new RuntimeException("Module not found"));
 
+        return module.getSlides().stream()
+                .filter(ms -> ms.getSlide().getId().equals(slideId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Slide not found in this module"));
+    }
+
+    @Transactional
+    public void reorder(long moduleId, List<Long> newOrderIds) {
+        Module module = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new RuntimeException("Module not found"));
+
+        int temp = -10000;
+        for (Long newOrderId : newOrderIds) {
+            findLink(newOrderId,module).setIndex(temp--);
+        }
+
+        moduleRepository.flush();
+
+        for (int i = 0; i < newOrderIds.size(); i++) {
+            findLink(newOrderIds.get(i),module).setIndex(i+1);
+        }
+
+        moduleRepository.save(module);
+    }
+
+    private ModuleSlide findLink(Long slideId,Module module){
         return module.getSlides().stream()
                 .filter(ms -> ms.getSlide().getId().equals(slideId))
                 .findFirst()

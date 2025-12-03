@@ -10,6 +10,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 class ModuleService {
@@ -50,8 +52,8 @@ class ModuleService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        if(!course.getModules().stream()
-                .anyMatch(cm -> cm.getModule().getId().equals(moduleId))){
+        if (!course.getModules().stream()
+                .anyMatch(cm -> cm.getModule().getId().equals(moduleId))) {
             throw new RuntimeException("Module not found in this course");
         }
 
@@ -64,7 +66,7 @@ class ModuleService {
     }
 
     @Transactional
-    public void delete(Long moduleId, Long courseId,String ownerEmail) {
+    public void delete(Long moduleId, Long courseId, String ownerEmail) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
@@ -72,11 +74,39 @@ class ModuleService {
             throw new org.springframework.security.access.AccessDeniedException("Это не ваш курс! Не трогайте слайды.");
         }
 
-        if (!course.getModules().removeIf(cm -> cm.getModule().getId().equals(moduleId))){
+        if (!course.getModules().removeIf(cm -> cm.getModule().getId().equals(moduleId))) {
             throw new RuntimeException("Module not linked to this course");
         }
 
         courseRepository.flush();
         moduleRepository.deleteById(moduleId);
+    }
+
+    @Transactional
+    public void reorder(Long courseId, List<Long> newOrderIds) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+
+        int temp = -1000;
+
+        for (Long newOrderId : newOrderIds) {
+            findLink(newOrderId, course).setIndex(temp--);
+        }
+
+        courseRepository.flush();
+
+        for (int i = 0; i < newOrderIds.size(); i++) {
+            findLink(newOrderIds.get(i), course).setIndex(i + 1);
+        }
+
+        courseRepository.save(course);
+    }
+
+    private CourseModule findLink(Long moduleId, Course course) {
+        return course.getModules().stream()
+                .filter(cm -> cm.getModule().getId().equals(moduleId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Module ID " + moduleId + " not found in course"));
     }
 }
