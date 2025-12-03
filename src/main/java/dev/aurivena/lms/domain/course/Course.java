@@ -1,21 +1,24 @@
-package dev.aurivena.lms.domain.organization;
+package dev.aurivena.lms.domain.course;
+
 
 import dev.aurivena.lms.domain.account.Account;
+import dev.aurivena.lms.domain.organization.Organization;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "organizations")
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "courses")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public class Organization {
+public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,24 +26,23 @@ public class Organization {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, unique = true)
-    private String tag;
-
     @Column(nullable = false)
     private String description;
 
+    private BigDecimal price;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id", nullable = false)
+    @JoinColumn(name = "owner", nullable = false)
     private Account owner;
 
-    @ManyToMany
-    @JoinTable(
-            name = "organization_accounts",
-            joinColumns = @JoinColumn(name = "organization_id"),
-            inverseJoinColumns = @JoinColumn(name = "account_id")
-    )
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("index ASC")
     @Builder.Default
-    private List<Account> members = new ArrayList<>();
+    private List<CourseModule> modules = new ArrayList<>();
 
     @Column(updatable = false)
     private Instant createdAt;
@@ -48,9 +50,5 @@ public class Organization {
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
-
-        if (this.tag != null) {
-            this.tag = this.tag.toUpperCase();
-        }
     }
 }

@@ -28,11 +28,11 @@ CREATE TABLE refresh_tokens
 CREATE TABLE organizations
 (
     id          BIGSERIAL PRIMARY KEY,
-    title        VARCHAR(125) NOT NULL,
+    title       VARCHAR(125) NOT NULL,
     tag         VARCHAR(15)  NOT NULL UNIQUE,
     description text         NOT NULL,
-    owner_id    BIGINT NOT NULL,
-    created_at     timestamp default now()
+    owner_id    BIGINT       NOT NULL,
+    created_at  timestamp default now()
 );
 
 
@@ -57,3 +57,9 @@ CREATE TABLE organization_accounts
 INSERT INTO accounts (email, password_hash, role, username, login)
 VALUES ('admin@lms.dev', '$2a$12$0/3t0IVWUy79ICq7iZL/KehehrMhk1WvHpIGBebTNuRG8mKl9MxF6', 'ADMIN', 'Admin',
         'admin_boss');
+
+INSERT INTO organizations (title, tag, description, owner_id, created_at)
+VALUES ('org1-test','HEROBRIN','Майн',1,now());
+
+INSERT INTO organization_accounts (organization_id, account_id)
+VALUES (1,1);

@@ -1,5 +1,6 @@
 package dev.aurivena.lms.domain.account;
 
+import dev.aurivena.lms.common.api.Spond;
 import dev.aurivena.lms.domain.account.dto.AccountResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/account")
 @Tag(name = "Account", description = "Работа с пользователем")
 @RequiredArgsConstructor
-public class AccountController {
+class AccountController {
     private final AccountService authService;
     private final AccountMapper accountMapper;
 
@@ -28,16 +29,16 @@ public class AccountController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Получение данных"),
             @ApiResponse(responseCode = "404", description = "Такого пользователя не существует",
-                    content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
+                    content = @Content(schema = @Schema(implementation = Spond.class)))
     })
     @GetMapping(value = "/me", produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<AccountResponse> getAccount(@AuthenticationPrincipal String email) {
+    public Spond<AccountResponse> getAccount(@AuthenticationPrincipal String email) {
         AccountResponse body = accountMapper.toResponse(authService.getAccountByEmail(email));
 
         if (body == null) {
-            return dev.aurivena.lms.common.api.ApiResponse.fail("404");
+            return Spond.fail("404");
         }
 
-        return dev.aurivena.lms.common.api.ApiResponse.success(body);
+        return Spond.success(body);
     }
 }
