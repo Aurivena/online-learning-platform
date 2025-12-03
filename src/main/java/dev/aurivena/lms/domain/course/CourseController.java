@@ -1,8 +1,11 @@
 package dev.aurivena.lms.domain.course;
 
+import dev.aurivena.lms.common.api.Spond;
 import dev.aurivena.lms.domain.course.dto.CourseResponse;
 import dev.aurivena.lms.domain.course.dto.CreateCourseRequest;
 import java.util.List;
+
+import dev.aurivena.lms.domain.course.dto.UpdateCourseRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,17 +19,22 @@ class CourseController {
     private final CourseService courseService;
 
     @PostMapping(produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<CourseResponse> create(@RequestBody CreateCourseRequest request, @PathVariable Long organizationId, @AuthenticationPrincipal String ownerEmail) {
-        return dev.aurivena.lms.common.api.ApiResponse.success(courseService.create(request, organizationId, ownerEmail));
+    public Spond<CourseResponse> create(@RequestBody CreateCourseRequest request, @PathVariable Long organizationId, @AuthenticationPrincipal String ownerEmail) {
+        return Spond.success(courseService.create(request, organizationId, ownerEmail));
     }
 
     @GetMapping(value = "/{courseId}", produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<CourseResponse> getByID(@PathVariable long courseId, @PathVariable Long organizationId) {
-        return dev.aurivena.lms.common.api.ApiResponse.success(courseService.findById(courseId, organizationId));
+    public Spond<CourseResponse> getByID(@PathVariable long courseId, @PathVariable Long organizationId) {
+        return Spond.success(courseService.findById(courseId, organizationId));
     }
 
     @GetMapping(produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<List<CourseResponse>> getAllByOrganization(@PathVariable Long organizationId) {
-        return dev.aurivena.lms.common.api.ApiResponse.success(courseService.findAllByOrganizationId(organizationId));
+    public Spond<List<CourseResponse>> getAllByOrganization(@PathVariable Long organizationId) {
+        return Spond.success(courseService.findAllByOrganizationId(organizationId));
+    }
+
+    @PutMapping("/{courseId}")
+    public Spond<CourseResponse> update(@RequestBody UpdateCourseRequest request, @PathVariable Long courseId, @PathVariable Long organizationId) {
+        return Spond.success(courseService.update(request,courseId,organizationId));
     }
 }

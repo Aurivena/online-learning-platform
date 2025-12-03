@@ -1,7 +1,9 @@
 package dev.aurivena.lms.domain.slide;
 
+import dev.aurivena.lms.common.api.Spond;
 import dev.aurivena.lms.domain.slide.dto.CreateSlideRequest;
 import dev.aurivena.lms.domain.slide.dto.SlideResponse;
+import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -15,12 +17,17 @@ class SlideController {
 
 
     @PostMapping(produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<SlideResponse> create(@RequestBody CreateSlideRequest request, @PathVariable long moduleId) {
-        return dev.aurivena.lms.common.api.ApiResponse.success(slideService.create(request, moduleId));
+    public Spond<SlideResponse> create(@RequestBody CreateSlideRequest request, @PathVariable long moduleId) {
+        return Spond.success(slideService.create(request, moduleId));
     }
 
     @GetMapping(value = "/{slideId}", produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<SlideResponse> getByID(@PathVariable long slideId, @PathVariable long moduleId) {
-        return dev.aurivena.lms.common.api.ApiResponse.success(slideService.findById(slideId, moduleId));
+    public Spond<SlideResponse> getByID(@PathVariable long slideId, @PathVariable long moduleId) {
+        return Spond.success(slideService.findById(slideId, moduleId));
+    }
+
+    @PutMapping("/{slideId}")
+    public Spond<SlideResponse> update(@RequestBody UpdateSlideRequest request, @PathVariable long slideId, @PathVariable long moduleId) {
+        return Spond.success(slideService.update(request,slideId,moduleId));
     }
 }

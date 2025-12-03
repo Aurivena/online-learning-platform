@@ -5,6 +5,7 @@ import dev.aurivena.lms.domain.course.CourseModule;
 import dev.aurivena.lms.domain.course.CourseRepository;
 import dev.aurivena.lms.domain.module.dto.CreateModuleRequest;
 import dev.aurivena.lms.domain.module.dto.ModuleResponse;
+import dev.aurivena.lms.domain.module.dto.UpdateModuleRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,15 @@ class ModuleService {
                 .orElseThrow(() -> new RuntimeException("Module not found in this course"));
 
         return moduleMapper.toResponse(link.getModule());
+    }
+
+    @Transactional
+    public ModuleResponse update(UpdateModuleRequest request, long moduleId, Long courseId) {
+        Module module = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new RuntimeException("module not found"));
+
+        module.setTitle(request.title());
+
+        return moduleMapper.toResponse(module);
     }
 }

@@ -5,9 +5,12 @@ import dev.aurivena.lms.domain.account.Account;
 import dev.aurivena.lms.domain.account.AccountService;
 import dev.aurivena.lms.domain.course.dto.CourseResponse;
 import dev.aurivena.lms.domain.course.dto.CreateCourseRequest;
+import dev.aurivena.lms.domain.course.dto.UpdateCourseRequest;
 import dev.aurivena.lms.domain.organization.Organization;
 import dev.aurivena.lms.domain.organization.OrganizationRepository;
+
 import java.util.List;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,11 +35,11 @@ public class CourseService {
     }
 
     @Transactional
-    public CourseResponse findById(Long id, Long organizationId) {
-        Course course = courseRepository.findById(id)
+    public CourseResponse findById(Long courseId, Long organizationId) {
+        Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        if (!course.getOrganization().getId().equals(organizationId)) {
+        if (notValidCourseOrganization(course, organizationId)) {
             throw new RuntimeException("Organization id not found");
         }
 
@@ -47,7 +50,26 @@ public class CourseService {
     public List<CourseResponse> findAllByOrganizationId(Long organizationId) {
         return courseRepository.findAllByOrganizationId(organizationId)
                 .stream()
-                .map(courseMapper:: toResponse)
+                .map(courseMapper::toResponse)
                 .toList();
+    }
+
+    @Transactional
+    public CourseResponse update(UpdateCourseRequest request, Long courseId, Long organizationId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (notValidCourseOrganization(course, organizationId)) {
+            throw new RuntimeException("Organization id not found");
+        }
+
+        course.setTitle(request.title());
+        course.setPrice(request.price());
+
+        return courseMapper.toResponse(course);
+    }
+
+    private boolean notValidCourseOrganization(Course course, Long organizationId) {
+        return !course.getOrganization().getId().equals(organizationId);
     }
 }

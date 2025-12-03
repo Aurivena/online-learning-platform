@@ -1,5 +1,6 @@
 package dev.aurivena.lms.domain.account;
 
+import dev.aurivena.lms.common.api.Spond;
 import dev.aurivena.lms.domain.account.dto.AuthRequest;
 import dev.aurivena.lms.domain.account.dto.AuthResponse;
 import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
@@ -35,11 +36,11 @@ class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Успешный вход"),
             @ApiResponse(responseCode = "400", description = "Ошибка валидации или неверные данные",
-                    content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
+                    content = @Content(schema = @Schema(implementation = Spond.class)))
     })
     @PostMapping(value = "/login", produces = "application/json")
     @SecurityRequirements()
-    public dev.aurivena.lms.common.api.ApiResponse<AuthResponse> login(@Valid @RequestBody AuthRequest request, HttpServletResponse response) {
+    public Spond<AuthResponse> login(@Valid @RequestBody AuthRequest request, HttpServletResponse response) {
         try {
             TokenPair tokens = authService.login(request);
 
@@ -47,7 +48,7 @@ class AuthController {
 
             setCookie(response, tokens.refreshToken());
 
-            return dev.aurivena.lms.common.api.ApiResponse.success(body);
+            return Spond.success(body);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -61,11 +62,11 @@ class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Аккаунт успешно создан"),
             @ApiResponse(responseCode = "400", description = "Ошибка валидации или неверные данные",
-                    content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
+                    content = @Content(schema = @Schema(implementation = Spond.class)))
     })
     @PostMapping(value = "/register", produces = "application/json")
     @SecurityRequirements()
-    public dev.aurivena.lms.common.api.ApiResponse<AuthResponse> registerAccount(@Valid @RequestBody RegistrationRequest request, HttpServletResponse response) {
+    public Spond<AuthResponse> registerAccount(@Valid @RequestBody RegistrationRequest request, HttpServletResponse response) {
         try {
             authService.register(request);
             AuthRequest authRequest = new AuthRequest(request.email(), request.password());
@@ -75,7 +76,7 @@ class AuthController {
 
             setCookie(response, tokens.refreshToken());
 
-            return dev.aurivena.lms.common.api.ApiResponse.success(body);
+            return Spond.success(body);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -88,10 +89,10 @@ class AuthController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Успешный выход",
-                    content = @Content(schema = @Schema(implementation = dev.aurivena.lms.common.api.ApiResponse.class)))
+                    content = @Content(schema = @Schema(implementation = Spond.class)))
     })
     @PostMapping(value = "/logout", produces = "application/json")
-    public dev.aurivena.lms.common.api.ApiResponse<String> logout(HttpServletResponse response) {
+    public Spond<String> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("refresh_token", null);
         cookie.setHttpOnly(true);
         cookie.setPath("/api/auth/refresh");
@@ -101,7 +102,7 @@ class AuthController {
 
         //TODO реализовать, чтобы удалялось из бд
 
-        return dev.aurivena.lms.common.api.ApiResponse.success("Logged out");
+        return Spond.success("Logged out");
     }
 
     private void setCookie(HttpServletResponse response, String refreshToken) {

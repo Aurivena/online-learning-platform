@@ -5,6 +5,7 @@ import dev.aurivena.lms.domain.module.ModuleRepository;
 import dev.aurivena.lms.domain.module.ModuleSlide;
 import dev.aurivena.lms.domain.slide.dto.CreateSlideRequest;
 import dev.aurivena.lms.domain.slide.dto.SlideResponse;
+import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,13 +33,28 @@ class SlideService {
 
     @Transactional
     public SlideResponse findById(Long slideId, long moduleId) {
+        return slideMapper.toResponse(getSlideBySlideIdAndModuleId(slideId, moduleId).getSlide());
+    }
+
+    @Transactional
+    public SlideResponse update(UpdateSlideRequest request, long slideId, long moduleId) {
+        ModuleSlide link = getSlideBySlideIdAndModuleId(slideId, moduleId);
+
+        link.getSlide().setTitle(request.title());
+        link.getSlide().setDescription(request.description());
+        link.getSlide().setSlideType(request.slideType());
+        link.getSlide().setPayload(request.payload());
+
+        return slideMapper.toResponse(link.getSlide());
+    }
+
+    private ModuleSlide getSlideBySlideIdAndModuleId(Long slideId, Long moduleId) {
         Module module = moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        ModuleSlide link = module.getSlides().stream()
+        return module.getSlides().stream()
                 .filter(ms -> ms.getSlide().getId().equals(slideId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Slide not found in this module"));
-        return slideMapper.toResponse(link.getSlide());
     }
 }

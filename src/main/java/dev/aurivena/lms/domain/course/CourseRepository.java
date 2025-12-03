@@ -1,5 +1,6 @@
 package dev.aurivena.lms.domain.course;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
