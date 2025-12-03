@@ -6,6 +6,7 @@ import dev.aurivena.lms.domain.slide.dto.SlideResponse;
 import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,5 +30,11 @@ class SlideController {
     @PutMapping("/{slideId}")
     public Spond<SlideResponse> update(@RequestBody UpdateSlideRequest request, @PathVariable long slideId, @PathVariable long moduleId) {
         return Spond.success(slideService.update(request,slideId,moduleId));
+    }
+
+    @DeleteMapping("/{slideId}")
+    public Spond<Void> delete(@PathVariable long slideId, @PathVariable long moduleId, @AuthenticationPrincipal String ownerEmail) {
+        slideService.delete(slideId, moduleId, ownerEmail);
+        return Spond.success(null);
     }
 }

@@ -3,6 +3,7 @@ package dev.aurivena.lms.domain.course;
 import dev.aurivena.lms.common.api.Spond;
 import dev.aurivena.lms.domain.course.dto.CourseResponse;
 import dev.aurivena.lms.domain.course.dto.CreateCourseRequest;
+
 import java.util.List;
 
 import dev.aurivena.lms.domain.course.dto.UpdateCourseRequest;
@@ -35,6 +36,12 @@ class CourseController {
 
     @PutMapping("/{courseId}")
     public Spond<CourseResponse> update(@RequestBody UpdateCourseRequest request, @PathVariable Long courseId, @PathVariable Long organizationId) {
-        return Spond.success(courseService.update(request,courseId,organizationId));
+        return Spond.success(courseService.update(request, courseId, organizationId));
+    }
+
+    @DeleteMapping("/{courseId}")
+    public Spond<Void> delete(@PathVariable Long courseId, @PathVariable Long organizationId, @AuthenticationPrincipal String ownerEmail) {
+        courseService.delete(courseId, organizationId, ownerEmail);
+        return Spond.success(null);
     }
 }

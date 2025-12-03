@@ -1,5 +1,7 @@
 package dev.aurivena.lms.domain.slide;
 
+import dev.aurivena.lms.domain.course.Course;
+import dev.aurivena.lms.domain.course.CourseRepository;
 import dev.aurivena.lms.domain.module.Module;
 import dev.aurivena.lms.domain.module.ModuleRepository;
 import dev.aurivena.lms.domain.module.ModuleSlide;
@@ -17,6 +19,7 @@ class SlideService {
     private final SlideMapper slideMapper;
     private final SlideRepository slideRepository;
     private final ModuleRepository moduleRepository;
+    private final CourseRepository courseRepository;
 
     @Transactional
     public SlideResponse create(CreateSlideRequest request, Long moduleId) {
@@ -48,9 +51,29 @@ class SlideService {
         return slideMapper.toResponse(link.getSlide());
     }
 
+    @Transactional
+    public void delete(Long slideId, long moduleId, String ownerEmail) {
+        Course course = courseRepository.findByModuleId(moduleId)
+                .orElseThrow(() -> new RuntimeException("Этот модуль не привязан ни к одному курсу!"));
+
+        if (!course.getOwner().getEmail().equals(ownerEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("Это не ваш курс! Не трогайте слайды.");
+        }
+
+        Module module = moduleRepository.findById(moduleId)
+                .orElseThrow(() -> new RuntimeException("Module not found"));
+
+        if (!module.getSlides().removeIf(ms -> ms.getSlide().getId().equals(slideId))) {
+            throw new RuntimeException("Slide not found in this module");
+        }
+
+        moduleRepository.flush();
+        slideRepository.deleteById(slideId);
+    }
+
     private ModuleSlide getSlideBySlideIdAndModuleId(Long slideId, Long moduleId) {
         Module module = moduleRepository.findById(moduleId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new RuntimeException("Module not found"));
 
         return module.getSlides().stream()
                 .filter(ms -> ms.getSlide().getId().equals(slideId))

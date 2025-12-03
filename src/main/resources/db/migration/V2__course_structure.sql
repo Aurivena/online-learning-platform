@@ -12,11 +12,11 @@ CREATE TABLE courses
 
     CONSTRAINT fk_course_owner_id
         FOREIGN KEY (owner)
-            REFERENCES accounts (id),
+            REFERENCES accounts (id) ON DELETE CASCADE ,
 
     CONSTRAINT fo_course_organization_id
         FOREIGN KEY (organization_id)
-            REFERENCES organizations (id)
+            REFERENCES organizations (id) ON DELETE CASCADE
 );
 
 CREATE TABLE modules
@@ -44,11 +44,11 @@ CREATE TABLE course_modules
 
     CONSTRAINT fk_course_modules_course_id
         FOREIGN KEY (course_id)
-            REFERENCES courses (id),
+            REFERENCES courses (id) ON DELETE CASCADE ,
 
     CONSTRAINT fk_course_modules_module_id
         FOREIGN KEY (module_id)
-            REFERENCES modules (id),
+            REFERENCES modules (id) ON DELETE CASCADE ,
 
     CONSTRAINT uq_course_modules_course_id_index UNIQUE (course_id, index),
 
@@ -64,11 +64,11 @@ CREATE TABLE module_slides
 
     CONSTRAINT fk_module_slides_module_id
         FOREIGN KEY (module_id)
-            REFERENCES modules (id),
+            REFERENCES modules (id) ON DELETE CASCADE ,
 
     CONSTRAINT fk_module_slides_slide_id
         FOREIGN KEY (slide_id)
-            REFERENCES slides (id),
+            REFERENCES slides (id) ON DELETE CASCADE ,
 
 
     CONSTRAINT uq_module_slides_module_id_index UNIQUE (module_id, index),
@@ -87,15 +87,15 @@ CREATE TABLE enrollment
 
     CONSTRAINT fk_enrollment_account_id
         FOREIGN KEY (account_id)
-            REFERENCES accounts (id),
+            REFERENCES accounts (id) ON DELETE CASCADE ,
 
     CONSTRAINT fk_enrollment_course_id
         FOREIGN KEY (course_id)
-            REFERENCES courses (id),
+            REFERENCES courses (id) ON DELETE CASCADE ,
 
     CONSTRAINT fk_enrollment_course_current_slide_id_slide
         FOREIGN KEY (current_slide_id)
-            REFERENCES slides (id),
+            REFERENCES slides (id) ON DELETE CASCADE ,
 
     PRIMARY KEY (account_id, course_id)
 );
@@ -160,3 +160,10 @@ VALUES (1, 1, 1),
 
 INSERT INTO module_slides (module_id, slide_id, index)
 VALUES (2, 3, 1);
+
+
+SELECT setval('accounts_id_seq', (SELECT MAX(id) FROM accounts));
+SELECT setval('organizations_id_seq', (SELECT MAX(id) FROM organizations));
+SELECT setval('courses_id_seq', (SELECT MAX(id) FROM courses));
+SELECT setval('modules_id_seq', (SELECT MAX(id) FROM modules));
+SELECT setval('slides_id_seq', (SELECT MAX(id) FROM slides));

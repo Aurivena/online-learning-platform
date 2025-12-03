@@ -47,11 +47,36 @@ class ModuleService {
 
     @Transactional
     public ModuleResponse update(UpdateModuleRequest request, long moduleId, Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if(!course.getModules().stream()
+                .anyMatch(cm -> cm.getModule().getId().equals(moduleId))){
+            throw new RuntimeException("Module not found in this course");
+        }
+
         Module module = moduleRepository.findById(moduleId)
                 .orElseThrow(() -> new RuntimeException("module not found"));
 
         module.setTitle(request.title());
 
         return moduleMapper.toResponse(module);
+    }
+
+    @Transactional
+    public void delete(Long moduleId, Long courseId,String ownerEmail) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (!course.getOwner().getEmail().equals(ownerEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("Это не ваш курс! Не трогайте слайды.");
+        }
+
+        if (!course.getModules().removeIf(cm -> cm.getModule().getId().equals(moduleId))){
+            throw new RuntimeException("Module not linked to this course");
+        }
+
+        courseRepository.flush();
+        moduleRepository.deleteById(moduleId);
     }
 }

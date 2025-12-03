@@ -69,7 +69,25 @@ public class CourseService {
         return courseMapper.toResponse(course);
     }
 
+    @Transactional
+    public void delete(Long courseId, Long organizationId, String ownerEmail) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        if (!course.getOwner().getEmail().equals(ownerEmail)) {
+            throw new org.springframework.security.access.AccessDeniedException("Это не ваш курс! Не трогайте слайды.");
+        }
+
+        if (notValidCourseOrganization(course, organizationId)) {
+            throw new RuntimeException("Organization id not found");
+        }
+
+        courseRepository.deleteById(courseId);
+    }
+
     private boolean notValidCourseOrganization(Course course, Long organizationId) {
+
+
         return !course.getOrganization().getId().equals(organizationId);
     }
 }
