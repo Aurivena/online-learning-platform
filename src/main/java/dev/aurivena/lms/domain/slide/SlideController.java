@@ -8,7 +8,6 @@ import dev.aurivena.lms.domain.slide.dto.SlideResponse;
 import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

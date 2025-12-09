@@ -1,9 +1,8 @@
 package dev.aurivena.lms.domain.minio;
 
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
 import io.minio.errors.ErrorResponseException;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +19,29 @@ public class MinioService {
         this.minioClient = minioClient;
     }
 
+
+    @PostConstruct
+    public void init() {
+        try {
+            boolean exists = minioClient.bucketExists(
+                    BucketExistsArgs.builder()
+                            .bucket(bucketName)
+                            .build()
+            );
+            if (!exists) {
+                minioClient.makeBucket(
+                        MakeBucketArgs.builder()
+                                .bucket(bucketName)
+                                .build()
+                );
+            } else {
+                throw new RuntimeException("Bucket {} already exists bucketName");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка инициализации MinIO / создания бакета", e);
+        }
+    }
+
     public String upload(MultipartFile file) {
         String fileName = UUID.randomUUID() + "." + FilenameUtils.getExtension(file.getOriginalFilename());
         try (InputStream inputStream = file.getInputStream()) {
@@ -32,6 +54,8 @@ public class MinioService {
                             .build()
             );
         } catch (Exception e) {
+            String es = e.getMessage();
+            String ec = String.valueOf(e.getClass());
             throw new RuntimeException("Ошибки загрузки файла в minio", e);
         }
 

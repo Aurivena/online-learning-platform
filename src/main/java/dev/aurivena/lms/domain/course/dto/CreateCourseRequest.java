@@ -8,7 +8,6 @@ import java.util.List;
 public record CreateCourseRequest(
         String title,
         String description,
-        BigDecimal price,
         List<ModuleSlide> modules
 ) {
 }

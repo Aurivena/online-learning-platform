@@ -9,7 +9,6 @@ public record CourseResponse(
         Long id,
         String title,
         String description,
-        BigDecimal price,
         List<ModuleResponse> modules
 ) {
 }

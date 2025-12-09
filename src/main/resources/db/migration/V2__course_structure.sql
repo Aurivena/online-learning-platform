@@ -5,7 +5,6 @@ CREATE TABLE courses
     id              BIGSERIAL PRIMARY KEY,
     title           VARCHAR(255) NOT NULL,
     description     text         NOT NULL,
-    price           DECIMAL(8, 2),
     owner           BIGINT,
     organization_id BIGINT,
     created_at      timestamp default now(),
@@ -100,11 +99,10 @@ CREATE TABLE enrollment
     PRIMARY KEY (account_id, course_id)
 );
 
-INSERT INTO courses (id, title, description, price, owner, organization_id)
+INSERT INTO courses (id, title, description, owner, organization_id)
 VALUES (1,
-        'Java Core: Путь Самурая',
+        'ЧПУ Изучение',
         'Полное погружение в JVM, Garbage Collector и боль.',
-        9990.50,
         1,
         1);
 
