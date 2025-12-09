@@ -1,4 +1,4 @@
-CREATE TYPE slide_variation as ENUM ('TEXT','VIDEO','TEST');
+CREATE TYPE slide_variation as ENUM ('TEXT','VIDEO_URL','TEST','FILE');
 
 CREATE TABLE courses
 (
@@ -117,13 +117,13 @@ VALUES (1, 1, 1),
        (1, 2, 2);
 
 INSERT INTO slides (id, title, description, slide_type, payload)
-VALUES (1, 'Что такое Java?', 'Краткий экскурс', 'TEXT',
+VALUES (1, 'ЧПУ', 'Краткий экскурс', 'TEXT',
         '{
-          "content": "# Java\nЭто строго типизированный объектно-ориентированный язык..."
+          "content": "# ЧПУ\nТекст рассказывающий об этом...."
         }'::jsonb);
 
 INSERT INTO slides (id, title, description, slide_type, payload)
-VALUES (2, 'Лекция от Гослинга', 'Историческое видео', 'VIDEO',
+VALUES (2, 'Лекция от Евгения Анатольевича Чепурина', 'Для чего ЧПУ', 'VIDEO_URL',
         '{
           "videoUrl": "https://youtube.com/watch?v=dQw4w9WgXcQ",
           "durationSeconds": 1200,
@@ -133,7 +133,7 @@ VALUES (2, 'Лекция от Гослинга', 'Историческое ви�
 INSERT INTO slides (id, title, description, slide_type, payload)
 VALUES (3, 'Проверка знаний', 'Тест по первой главе', 'TEST',
         '{
-          "question": "В каком году вышла Java 1.0?",
+          "question": "В каком году было придумано ЧПУ",
           "isMultiSelect": false,
           "options": [
             {

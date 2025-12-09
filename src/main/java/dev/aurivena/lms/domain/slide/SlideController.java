@@ -1,13 +1,17 @@
 package dev.aurivena.lms.domain.slide;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.aurivena.lms.common.api.Spond;
 import dev.aurivena.lms.domain.slide.dto.CreateSlideRequest;
 import dev.aurivena.lms.domain.slide.dto.SlideResponse;
 import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,11 +21,31 @@ import java.util.List;
 @RequiredArgsConstructor
 class SlideController {
     private final SlideService slideService;
+    private final ObjectMapper objectMapper;
 
+    @PostMapping
+    public SlideResponse create(
+            @PathVariable Long moduleId,
+            @RequestParam("title") String title,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam("slideType") SlideType slideType,
+            @RequestParam(value = "payload", required = false) String payloadRaw,
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) throws Exception {
 
-    @PostMapping(produces = "application/json")
-    public Spond<SlideResponse> create(@RequestBody CreateSlideRequest request, @PathVariable long moduleId) {
-        return Spond.success(slideService.create(request, moduleId));
+        JsonNode payload = null;
+        if (payloadRaw != null && !payloadRaw.isBlank()) {
+            payload = objectMapper.readTree(payloadRaw);
+        }
+
+        CreateSlideRequest request = new CreateSlideRequest(
+                title,
+                description,
+                slideType,
+                payload
+        );
+
+        return slideService.create(request, moduleId, file);
     }
 
     @GetMapping(value = "/{slideId}", produces = "application/json")
