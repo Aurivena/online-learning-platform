@@ -35,7 +35,7 @@ public class MinioService {
                                 .build()
                 );
             } else {
-                throw new RuntimeException("Bucket {} already exists bucketName");
+                System.err.println("Bucket {} already exists bucketName");
             }
         } catch (Exception e) {
             throw new RuntimeException("Ошибка инициализации MinIO / создания бакета", e);
@@ -54,8 +54,6 @@ public class MinioService {
                             .build()
             );
         } catch (Exception e) {
-            String es = e.getMessage();
-            String ec = String.valueOf(e.getClass());
             throw new RuntimeException("Ошибки загрузки файла в minio", e);
         }
 

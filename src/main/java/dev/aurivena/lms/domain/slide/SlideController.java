@@ -8,6 +8,7 @@ import dev.aurivena.lms.domain.slide.dto.SlideResponse;
 import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,28 +23,12 @@ class SlideController {
     private final SlideService slideService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public SlideResponse create(
             @PathVariable Long moduleId,
-            @RequestParam("title") String title,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam("slideType") SlideType slideType,
-            @RequestParam(value = "payload", required = false) String payloadRaw,
-            @RequestParam(value = "file", required = false) MultipartFile file
+            @RequestPart("request") CreateSlideRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file
     ) throws Exception {
-
-        JsonNode payload = null;
-        if (payloadRaw != null && !payloadRaw.isBlank()) {
-            payload = objectMapper.readTree(payloadRaw);
-        }
-
-        CreateSlideRequest request = new CreateSlideRequest(
-                title,
-                description,
-                slideType,
-                payload
-        );
-
         return slideService.create(request, moduleId, file);
     }
 

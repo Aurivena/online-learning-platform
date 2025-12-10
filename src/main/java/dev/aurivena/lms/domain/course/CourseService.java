@@ -85,8 +85,6 @@ public class CourseService {
     }
 
     private boolean notValidCourseOrganization(Course course, Long organizationId) {
-
-
         return !course.getOrganization().getId().equals(organizationId);
     }
 }
