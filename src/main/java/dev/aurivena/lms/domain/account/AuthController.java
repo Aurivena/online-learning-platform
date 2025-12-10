@@ -15,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,19 +65,13 @@ class AuthController {
             @ApiResponse(responseCode = "400", description = "Ошибка валидации или неверные данные",
                     content = @Content(schema = @Schema(implementation = Spond.class)))
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = "/register", produces = "application/json")
     @SecurityRequirements()
-    public Spond<AuthResponse> registerAccount(@Valid @RequestBody RegistrationRequest request, HttpServletResponse response) {
+    public Spond<Void> registerAccount(@Valid @RequestBody RegistrationRequest request) {
         try {
             authService.register(request);
-            AuthRequest authRequest = new AuthRequest(request.email(), request.password());
-            TokenPair tokens = authService.login(authRequest);
-
-            AuthResponse body = new AuthResponse(tokens.accessToken());
-
-            setCookie(response, tokens.refreshToken());
-
-            return Spond.success(body);
+            return Spond.success(null);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
