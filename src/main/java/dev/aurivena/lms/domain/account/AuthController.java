@@ -58,7 +58,7 @@ class AuthController {
 
     @Operation(
             summary = "Регистрация в системе",
-            description = "Возвращает Access Token в теле и устанавливает Refresh Token в HttpOnly Cookie"
+            description = "Регистрирует пользователя в системе"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Аккаунт успешно создан"),
