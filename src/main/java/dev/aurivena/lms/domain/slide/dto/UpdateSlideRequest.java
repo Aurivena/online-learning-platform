@@ -2,12 +2,12 @@ package dev.aurivena.lms.domain.slide.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.aurivena.lms.domain.slide.SlideType;
+import org.springframework.web.multipart.MultipartFile;
 
 public record UpdateSlideRequest(
         String title,
         String description,
         SlideType slideType,
-        JsonNode payload,
-        int index
+        JsonNode payload
 ) {
 }

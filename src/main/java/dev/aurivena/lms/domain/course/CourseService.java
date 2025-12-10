@@ -64,7 +64,6 @@ public class CourseService {
         }
 
         course.setTitle(request.title());
-        course.setPrice(request.price());
 
         return courseMapper.toResponse(course);
     }
@@ -86,8 +85,6 @@ public class CourseService {
     }
 
     private boolean notValidCourseOrganization(Course course, Long organizationId) {
-
-
         return !course.getOrganization().getId().equals(organizationId);
     }
 }

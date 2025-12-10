@@ -29,8 +29,6 @@ public class Course {
     @Column(nullable = false)
     private String description;
 
-    private BigDecimal price;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner", nullable = false)
     private Account owner;

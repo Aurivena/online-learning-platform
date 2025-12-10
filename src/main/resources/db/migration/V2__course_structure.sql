@@ -1,11 +1,10 @@
-CREATE TYPE slide_variation as ENUM ('TEXT','VIDEO','TEST');
+CREATE TYPE slide_variation as ENUM ('TEXT','VIDEO_URL','TEST','FILE');
 
 CREATE TABLE courses
 (
     id              BIGSERIAL PRIMARY KEY,
     title           VARCHAR(255) NOT NULL,
     description     text         NOT NULL,
-    price           DECIMAL(8, 2),
     owner           BIGINT,
     organization_id BIGINT,
     created_at      timestamp default now(),
@@ -100,11 +99,10 @@ CREATE TABLE enrollment
     PRIMARY KEY (account_id, course_id)
 );
 
-INSERT INTO courses (id, title, description, price, owner, organization_id)
+INSERT INTO courses (id, title, description, owner, organization_id)
 VALUES (1,
-        'Java Core: Путь Самурая',
+        'ЧПУ Изучение',
         'Полное погружение в JVM, Garbage Collector и боль.',
-        9990.50,
         1,
         1);
 
@@ -117,13 +115,13 @@ VALUES (1, 1, 1),
        (1, 2, 2);
 
 INSERT INTO slides (id, title, description, slide_type, payload)
-VALUES (1, 'Что такое Java?', 'Краткий экскурс', 'TEXT',
+VALUES (1, 'ЧПУ', 'Краткий экскурс', 'TEXT',
         '{
-          "content": "# Java\nЭто строго типизированный объектно-ориентированный язык..."
+          "content": "# ЧПУ\nТекст рассказывающий об этом...."
         }'::jsonb);
 
 INSERT INTO slides (id, title, description, slide_type, payload)
-VALUES (2, 'Лекция от Гослинга', 'Историческое видео', 'VIDEO',
+VALUES (2, 'Лекция от Евгения Анатольевича Чепурина', 'Для чего ЧПУ', 'VIDEO_URL',
         '{
           "videoUrl": "https://youtube.com/watch?v=dQw4w9WgXcQ",
           "durationSeconds": 1200,
@@ -133,7 +131,7 @@ VALUES (2, 'Лекция от Гослинга', 'Историческое ви�
 INSERT INTO slides (id, title, description, slide_type, payload)
 VALUES (3, 'Проверка знаний', 'Тест по первой главе', 'TEST',
         '{
-          "question": "В каком году вышла Java 1.0?",
+          "question": "В каком году было придумано ЧПУ",
           "isMultiSelect": false,
           "options": [
             {

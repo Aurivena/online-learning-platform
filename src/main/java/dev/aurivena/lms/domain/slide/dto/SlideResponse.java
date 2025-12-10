@@ -2,6 +2,7 @@ package dev.aurivena.lms.domain.slide.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.aurivena.lms.domain.slide.SlideType;
+import org.springframework.web.multipart.MultipartFile;
 
 public record SlideResponse(
         Long id,
