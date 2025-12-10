@@ -3,6 +3,7 @@ package dev.aurivena.lms.domain.minio;
 import io.minio.*;
 import io.minio.errors.ErrorResponseException;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class MinioService {
     private MinioClient minioClient;
@@ -35,7 +37,7 @@ public class MinioService {
                                 .build()
                 );
             } else {
-                System.err.println("Bucket {} already exists bucketName");
+                log.warn("Bucket {} already exists: ", bucketName);
             }
         } catch (Exception e) {
             throw new RuntimeException("Ошибка инициализации MinIO / создания бакета", e);
@@ -77,6 +79,19 @@ public class MinioService {
             throw new RuntimeException("Ошибка при чтении файла из MinIO", e);
         } catch (Exception e) {
             throw new RuntimeException("Ошибка при чтении файла из MinIO", e);
+        }
+    }
+
+    public void delete(String filename) {
+        try {
+            minioClient.removeObject(
+                    RemoveObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(filename)
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("failed delete file", e);
         }
     }
 }
