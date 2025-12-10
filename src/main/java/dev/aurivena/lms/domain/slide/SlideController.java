@@ -22,7 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 class SlideController {
     private final SlideService slideService;
-    private final ObjectMapper objectMapper;
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public SlideResponse create(
