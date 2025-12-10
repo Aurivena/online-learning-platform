@@ -14,13 +14,16 @@ import dev.aurivena.lms.domain.slide.dto.SlideResponse;
 import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 class SlideService {
@@ -33,16 +36,8 @@ class SlideService {
 
     @Transactional
     public SlideResponse create(CreateSlideRequest request, Long moduleId, MultipartFile file) {
-        JsonNode payloadToSave = request.payload();
 
-        if (request.slideType() == SlideType.FILE) {
-            if (file == null || file.isEmpty()) {
-                throw new IllegalArgumentException("file required");
-            }
-            String filename = minioService.upload(file);
-            payloadToSave = objectMapper.createObjectNode()
-                    .put("filename", filename);
-        }
+        JsonNode payloadToSave = uploadFile(request.payload(), request.slideType(), file);
 
         Slide slide = slideMapper.toEntity(
                 new CreateSlideRequest(
@@ -103,13 +98,35 @@ class SlideService {
     }
 
     @Transactional
-    public SlideResponse update(UpdateSlideRequest request, long slideId, long moduleId) {
+    public SlideResponse update(UpdateSlideRequest request, MultipartFile file, long slideId, long moduleId) throws IOException {
         ModuleSlide link = getSlideBySlideIdAndModuleId(slideId, moduleId);
+
+        String oldFileName = null;
+        if (link.getSlide().getPayload() != null && link.getSlide().getPayload().has("filename")) {
+            oldFileName = link.getSlide().getPayload().get("filename").asText();
+        }
+
+        boolean fileWasUpdated = false;
+        JsonNode newPayload = request.payload();
+
+        if (file != null && !file.isEmpty() && request.slideType() == SlideType.FILE) {
+            newPayload = uploadFile(request.payload(), request.slideType(), file);
+            fileWasUpdated = true;
+        }
 
         link.getSlide().setTitle(request.title());
         link.getSlide().setDescription(request.description());
         link.getSlide().setSlideType(request.slideType());
-        link.getSlide().setPayload(request.payload());
+        link.getSlide().setPayload(newPayload);
+
+        if (fileWasUpdated && oldFileName != null) {
+            try {
+                minioService.delete(oldFileName);
+            } catch (Exception e) {
+                log.warn("Error at delete: {}", oldFileName);
+            }
+        }
+
 
         return slideMapper.toResponse(link.getSlide());
     }
@@ -169,5 +186,23 @@ class SlideService {
                 .filter(ms -> ms.getSlide().getId().equals(slideId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Slide not found in this module"));
+    }
+
+    private JsonNode uploadFile(JsonNode payload, SlideType slideType, MultipartFile file) {
+        JsonNode newPayload = payload;
+        String filename = null;
+        if (slideType == SlideType.FILE) {
+            if (file == null && file.isEmpty()) {
+                throw new IllegalArgumentException("file required");
+            }
+            try {
+                filename = minioService.upload(file);
+            } catch (Exception e) {
+                log.warn("error at upload file: {}", e.getMessage());
+            }
+            newPayload = objectMapper.createObjectNode()
+                    .put("filename", filename);
+        }
+        return newPayload;
     }
 }

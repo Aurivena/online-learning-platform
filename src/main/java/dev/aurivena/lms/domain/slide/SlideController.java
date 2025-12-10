@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,7 +24,7 @@ class SlideController {
     private final SlideService slideService;
     private final ObjectMapper objectMapper;
 
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public SlideResponse create(
             @PathVariable Long moduleId,
             @RequestPart("request") CreateSlideRequest request,
@@ -37,9 +38,13 @@ class SlideController {
         return Spond.success(slideService.findById(slideId, moduleId));
     }
 
-    @PutMapping("/{slideId}")
-    public Spond<SlideResponse> update(@RequestBody UpdateSlideRequest request, @PathVariable long slideId, @PathVariable long moduleId) {
-        return Spond.success(slideService.update(request, slideId, moduleId));
+    @PutMapping(value = "/{slideId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public Spond<SlideResponse> update(
+            @RequestPart("request") UpdateSlideRequest request,
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @PathVariable long slideId,
+            @PathVariable long moduleId) throws IOException {
+        return Spond.success(slideService.update(request, file, slideId, moduleId));
     }
 
     @DeleteMapping("/{slideId}")
