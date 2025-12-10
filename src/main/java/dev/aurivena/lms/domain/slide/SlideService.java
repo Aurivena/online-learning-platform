@@ -33,16 +33,8 @@ class SlideService {
 
     @Transactional
     public SlideResponse create(CreateSlideRequest request, Long moduleId, MultipartFile file) {
-        JsonNode payloadToSave = request.payload();
 
-        if (request.slideType() == SlideType.FILE) {
-            if (file == null || file.isEmpty()) {
-                throw new IllegalArgumentException("file required");
-            }
-            String filename = minioService.upload(file);
-            payloadToSave = objectMapper.createObjectNode()
-                    .put("filename", filename);
-        }
+        JsonNode payloadToSave = downloadFile(request.payload(), request.slideType(), file);
 
         Slide slide = slideMapper.toEntity(
                 new CreateSlideRequest(
@@ -103,13 +95,17 @@ class SlideService {
     }
 
     @Transactional
-    public SlideResponse update(UpdateSlideRequest request, long slideId, long moduleId) {
+    public SlideResponse update(UpdateSlideRequest request, MultipartFile file, long slideId, long moduleId) {
         ModuleSlide link = getSlideBySlideIdAndModuleId(slideId, moduleId);
 
         link.getSlide().setTitle(request.title());
         link.getSlide().setDescription(request.description());
         link.getSlide().setSlideType(request.slideType());
-        link.getSlide().setPayload(request.payload());
+        if (file != null && !file.isEmpty() && request.slideType().equals(SlideType.FILE)) {
+            link.getSlide().setPayload(downloadFile(request.payload(), request.slideType(), file));
+        } else {
+            link.getSlide().setPayload(request.payload());
+        }
 
         return slideMapper.toResponse(link.getSlide());
     }
@@ -169,5 +165,18 @@ class SlideService {
                 .filter(ms -> ms.getSlide().getId().equals(slideId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Slide not found in this module"));
+    }
+
+    private JsonNode downloadFile(JsonNode payload, SlideType slideType, MultipartFile file) {
+        JsonNode newPayload = payload;
+        if (slideType == SlideType.FILE) {
+            if (file == null && file.isEmpty()) {
+                throw new IllegalArgumentException("file required");
+            }
+            String filename = minioService.upload(file);
+            newPayload = objectMapper.createObjectNode()
+                    .put("filename", filename);
+        }
+        return newPayload;
     }
 }
