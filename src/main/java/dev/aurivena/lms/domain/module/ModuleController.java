@@ -6,6 +6,7 @@ import dev.aurivena.lms.domain.module.dto.ModuleResponse;
 import dev.aurivena.lms.domain.module.dto.UpdateModuleRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ class ModuleController {
     private final ModuleService moduleService;
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = "application/json")
     public Spond<ModuleResponse> create(@RequestBody CreateModuleRequest request, @PathVariable Long courseId) {
         return Spond.success(moduleService.create(request, courseId));
@@ -29,17 +31,20 @@ class ModuleController {
         return Spond.success(moduleService.findById(moduleId, courseId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{moduleId}")
     public Spond<ModuleResponse> update(@RequestBody UpdateModuleRequest request, @PathVariable long moduleId, @PathVariable Long courseId) {
         return Spond.success(moduleService.update(request, moduleId, courseId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{moduleId}")
     public Spond<Void> delete(@PathVariable long moduleId, @PathVariable Long courseId, @AuthenticationPrincipal String ownerEmail) {
         moduleService.delete(moduleId, courseId, ownerEmail);
         return Spond.success(null);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/reorder")
     public Spond<Void> reorder(@PathVariable Long courseId, @RequestBody List<Long> newOrderIds) {
         moduleService.reorder(courseId, newOrderIds);

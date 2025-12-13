@@ -20,7 +20,7 @@ public class OrganizationService {
     private final AccountService accountService;
 
     @Transactional
-    public OrganizationResponse create(CreateOrganizationRequest createOrganizationRequest,String ownerEmail) {
+    public OrganizationResponse create(CreateOrganizationRequest createOrganizationRequest, String ownerEmail) {
         Account owner = accountService.getAccountByEmail(ownerEmail);
 
         Organization org = organizationMapper.toEntity(createOrganizationRequest);
@@ -30,14 +30,14 @@ public class OrganizationService {
     }
 
     @Transactional()
-    public Page<OrganizationResponse> search(String login, String tag, Pageable pageable) {
-        return organizationRepository.search(login, tag, pageable).map(organizationMapper::toResponse);
+    public Page<OrganizationResponse> search(String accountID, Pageable pageable) {
+        return organizationRepository.search(accountID, pageable).map(organizationMapper::toResponse);
     }
 
     @Transactional()
     public OrganizationResponse getByTag(String tag) {
         Organization organization = organizationRepository.findByTag(tag)
-                .orElseThrow(()-> new RuntimeException("Organization not found"));
+                .orElseThrow(() -> new RuntimeException("Organization not found"));
         return organizationMapper.toResponse(organization);
 
     }

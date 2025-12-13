@@ -12,13 +12,11 @@ import java.util.Optional;
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
     @Query("""
         SELECT o FROM Organization o 
-        JOIN o.owner u 
-        WHERE (:login IS NULL OR u.email = :login OR u.login = :login) 
-        AND (:tag IS NULL OR o.tag = :tag) 
+        JOIN  o.members m
+        WHERE (:accountId IS NULL OR m.id = :accountId)
     """)
     Page<Organization> search(
-            @Param("login") String login,
-            @Param("tag") String tag,
+            @Param("accountId") String accountId,
             Pageable pageable
     );
 

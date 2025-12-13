@@ -9,6 +9,7 @@ import java.util.List;
 import dev.aurivena.lms.domain.course.dto.UpdateCourseRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 class CourseController {
     private final CourseService courseService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = "application/json")
     public Spond<CourseResponse> create(@RequestBody CreateCourseRequest request, @PathVariable Long organizationId, @AuthenticationPrincipal String ownerEmail) {
         return Spond.success(courseService.create(request, organizationId, ownerEmail));
@@ -34,11 +36,13 @@ class CourseController {
         return Spond.success(courseService.findAllByOrganizationId(organizationId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{courseId}")
     public Spond<CourseResponse> update(@RequestBody UpdateCourseRequest request, @PathVariable Long courseId, @PathVariable Long organizationId) {
         return Spond.success(courseService.update(request, courseId, organizationId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{courseId}")
     public Spond<Void> delete(@PathVariable Long courseId, @PathVariable Long organizationId, @AuthenticationPrincipal String ownerEmail) {
         courseService.delete(courseId, organizationId, ownerEmail);

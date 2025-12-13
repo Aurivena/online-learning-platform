@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 public class OrganizationController {
     private final OrganizationService organizationService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(produces = "application/json")
     public Spond<OrganizationResponse> createOrganization(@Valid @RequestBody CreateOrganizationRequest request, @AuthenticationPrincipal String email) {
         return Spond.success(organizationService.create(request, email));
@@ -28,9 +29,8 @@ public class OrganizationController {
 
     @Operation(summary = "Поиск организаций")
     @GetMapping(produces = "application/json")
-    public Spond<Page<OrganizationResponse>> search(@RequestParam(required = false) String login, @RequestParam(required = false) String tag, @ParameterObject Pageable pageable
-    ) {
-        return Spond.success(organizationService.search(login, tag, pageable));
+    public Spond<Page<OrganizationResponse>> search(@RequestParam(required = false) String accountID, Pageable pageable) {
+        return Spond.success(organizationService.search(accountID,pageable));
     }
 
     @Operation(summary = "Получить организацию по тегу")

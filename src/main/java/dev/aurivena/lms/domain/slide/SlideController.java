@@ -9,6 +9,7 @@ import dev.aurivena.lms.domain.slide.dto.UpdateSlideRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,7 @@ import java.util.List;
 class SlideController {
     private final SlideService slideService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public SlideResponse create(
             @PathVariable Long moduleId,
@@ -37,6 +39,7 @@ class SlideController {
         return Spond.success(slideService.findById(slideId, moduleId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{slideId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public Spond<SlideResponse> update(
             @RequestPart("request") UpdateSlideRequest request,
@@ -46,12 +49,14 @@ class SlideController {
         return Spond.success(slideService.update(request, file, slideId, moduleId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{slideId}")
     public Spond<Void> delete(@PathVariable long slideId, @PathVariable long moduleId, @AuthenticationPrincipal String ownerEmail) {
         slideService.delete(slideId, moduleId, ownerEmail);
         return Spond.success(null);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/reorder")
     public Spond<Void> recorder(@PathVariable long moduleId, @RequestBody List<Long> newOrderIds) {
         slideService.reorder(moduleId, newOrderIds);

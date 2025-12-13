@@ -3,6 +3,8 @@ package dev.aurivena.lms.domain.account;
 import dev.aurivena.lms.common.security.JwtService;
 import dev.aurivena.lms.domain.account.dto.AuthRequest;
 import dev.aurivena.lms.domain.account.dto.RegistrationRequest;
+import dev.aurivena.lms.domain.organization.Organization;
+import dev.aurivena.lms.domain.organization.OrganizationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,6 +24,7 @@ public class AccountService {
     private final RefreshRepository refreshRepository;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final OrganizationRepository organizationRepository;
 
     @Transactional
     public TokenPair login(AuthRequest request) {
@@ -55,11 +58,17 @@ public class AccountService {
             throw new BadCredentialsException("Login already exists");
         }
 
+        Organization organization = organizationRepository.findById(request.organization().getId())
+                .orElseThrow(()-> new RuntimeException("Organization not found"));
+
         Account account = accountMapper.toEntity(request);
 
         account.setPasswordHash(passwordEncoder.encode(request.password()));
 
         accountRepository.save(account);
+
+        organization.getMembers().add(account);
+        organizationRepository.save(organization);
     }
 
     @Transactional
