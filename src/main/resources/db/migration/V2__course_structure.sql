@@ -11,7 +11,7 @@ CREATE TABLE courses
 
     CONSTRAINT fk_course_owner_id
         FOREIGN KEY (owner)
-            REFERENCES accounts (id) ON DELETE CASCADE ,
+            REFERENCES accounts (id) ON DELETE CASCADE,
 
     CONSTRAINT fo_course_organization_id
         FOREIGN KEY (organization_id)
@@ -35,6 +35,18 @@ CREATE TABLE slides
     created_at  timestamp default now()
 );
 
+CREATE TABLE slide_payload
+(
+    id       BIGSERIAL PRIMARY KEY,
+    slide_id BIGINT,
+    text     text,
+    output   varchar(255),
+
+    CONSTRAINT fk_slide_payload_slide_id
+        FOREIGN KEY (slide_id)
+            REFERENCES slides (id)
+);
+
 CREATE TABLE course_modules
 (
     course_id BIGINT,
@@ -43,11 +55,11 @@ CREATE TABLE course_modules
 
     CONSTRAINT fk_course_modules_course_id
         FOREIGN KEY (course_id)
-            REFERENCES courses (id) ON DELETE CASCADE ,
+            REFERENCES courses (id) ON DELETE CASCADE,
 
     CONSTRAINT fk_course_modules_module_id
         FOREIGN KEY (module_id)
-            REFERENCES modules (id) ON DELETE CASCADE ,
+            REFERENCES modules (id) ON DELETE CASCADE,
 
     CONSTRAINT uq_course_modules_course_id_index UNIQUE (course_id, index),
 
@@ -63,11 +75,11 @@ CREATE TABLE module_slides
 
     CONSTRAINT fk_module_slides_module_id
         FOREIGN KEY (module_id)
-            REFERENCES modules (id) ON DELETE CASCADE ,
+            REFERENCES modules (id) ON DELETE CASCADE,
 
     CONSTRAINT fk_module_slides_slide_id
         FOREIGN KEY (slide_id)
-            REFERENCES slides (id) ON DELETE CASCADE ,
+            REFERENCES slides (id) ON DELETE CASCADE,
 
 
     CONSTRAINT uq_module_slides_module_id_index UNIQUE (module_id, index),
@@ -86,15 +98,15 @@ CREATE TABLE enrollment
 
     CONSTRAINT fk_enrollment_account_id
         FOREIGN KEY (account_id)
-            REFERENCES accounts (id) ON DELETE CASCADE ,
+            REFERENCES accounts (id) ON DELETE CASCADE,
 
     CONSTRAINT fk_enrollment_course_id
         FOREIGN KEY (course_id)
-            REFERENCES courses (id) ON DELETE CASCADE ,
+            REFERENCES courses (id) ON DELETE CASCADE,
 
     CONSTRAINT fk_enrollment_course_current_slide_id_slide
         FOREIGN KEY (current_slide_id)
-            REFERENCES slides (id) ON DELETE CASCADE ,
+            REFERENCES slides (id) ON DELETE CASCADE,
 
     PRIMARY KEY (account_id, course_id)
 );

@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
-import java.util.Objects;
 
 
 @Slf4j
@@ -37,17 +36,24 @@ class SlideService {
 
     @Transactional
     public SlideResponse create(CreateSlideRequest request, Long moduleId, MultipartFile file) {
-
-        JsonNode payloadToSave = uploadFile(request.payload(), request.slideType(), file);
-
         Slide slide = slideMapper.toEntity(
                 new CreateSlideRequest(
                         request.title(),
                         request.description(),
                         request.slideType(),
-                        payloadToSave
+                        null
                 )
         );
+
+        JsonNode finalPayloadText = request.payload().getText();
+
+        if (file != null) {
+            finalPayloadText = uploadFile(request.payload().text, request.slideType(), file);
+        }
+
+        Payload payloadToSave = Payload.create(slide, finalPayloadText, request.payload().getOutput());
+
+        slide.setPayload(payloadToSave);
 
         slide = slideRepository.save(slide);
         Module module = moduleRepository.findById(moduleId)
@@ -68,12 +74,12 @@ class SlideService {
             return slideMapper.toResponse(slide);
         }
 
-        JsonNode payload = slide.getPayload();
-        if (payload == null || payload.isNull()) {
+        Payload payload = slide.getPayload();
+        if (payload == null || payload.text.isNull()) {
             throw new IllegalStateException("FILE slide without payload");
         }
 
-        JsonNode filenameNode = payload.get("filename");
+        JsonNode filenameNode = payload.text.get("filename");
         if (filenameNode == null || filenameNode.isNull() || filenameNode.asText().isBlank()) {
             throw new IllegalStateException("FILE slide without filename in payload");
         }
@@ -82,8 +88,8 @@ class SlideService {
         byte[] body = minioService.get(filename);
         String base64 = Base64.getEncoder().encodeToString(body);
 
-        ObjectNode enrichedPayload = (payload.isObject()
-                ? ((ObjectNode) payload).deepCopy()
+        ObjectNode enrichedPayload = (payload.text.isObject()
+                ? ((ObjectNode) payload.text).deepCopy()
                 : objectMapper.createObjectNode());
 
         enrichedPayload.put("filename", filename);
@@ -103,15 +109,15 @@ class SlideService {
         Slide slide = getSlideBySlideIdAndModuleId(slideId, moduleId);
 
         String oldFileName = null;
-        if (slide.getPayload() != null && slide.getPayload().has("filename")) {
-            oldFileName = slide.getPayload().get("filename").asText();
+        if (slide.getPayload() != null && slide.getPayload().text.has("filename")) {
+            oldFileName = slide.getPayload().text.get("filename").asText();
         }
 
         boolean fileWasUpdated = false;
-        JsonNode newPayload = request.payload();
+        Payload newPayload = request.payload();
 
         if (file != null && !file.isEmpty() && request.slideType() == SlideType.FILE) {
-            newPayload = uploadFile(request.payload(), request.slideType(), file);
+            newPayload.text = uploadFile(request.payload().text, request.slideType(), file);
             fileWasUpdated = true;
         }
 
@@ -175,20 +181,20 @@ class SlideService {
     @Transactional
     public Boolean checkOption(long slideId, long moduleId, Long selectedOptionId) {
         Slide slide = getSlideBySlideIdAndModuleId(slideId, moduleId);
-        JsonNode payload = slide.getPayload();
+        Payload payload = slide.getPayload();
 
-        if (payload == null || payload.get("output") == null) {
+        if (payload == null || payload.output.get("output") == null) {
             throw new RuntimeException("Test payload invalid");
         }
 
-        Long outputId = payload.get("output").asLong();
+        Long outputId = payload.output.get("output").asLong();
 
         if (!outputId.equals(selectedOptionId)) {
-            updateIsRight(slide,false);
+            updateIsRight(slide, false);
             return false;
         }
 
-        updateIsRight(slide,true);
+        updateIsRight(slide, true);
         return true;
     }
 
@@ -229,7 +235,7 @@ class SlideService {
     }
 
     private void updateIsRight(Slide slide, Boolean right) {
-        JsonNode payload = slide.getPayload();
+        JsonNode payload = slide.getPayload().text;
 
         if (!(payload instanceof ObjectNode objectNode)) {
             throw new IllegalStateException("Payload is not ObjectNode");
@@ -237,6 +243,6 @@ class SlideService {
 
         objectNode.put("is_right", right);
 
-        slide.setPayload(objectNode);
+        slide.getPayload().output = objectNode;
     }
 }
