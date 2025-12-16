@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -61,7 +62,7 @@ class SlideService {
 
     @Transactional
     public SlideResponse findById(Long slideId, long moduleId) {
-        Slide slide = getSlideBySlideIdAndModuleId(slideId, moduleId).getSlide();
+        Slide slide = getSlideBySlideIdAndModuleId(slideId, moduleId);
 
         if (slide.getSlideType() != SlideType.FILE) {
             return slideMapper.toResponse(slide);
@@ -99,11 +100,11 @@ class SlideService {
 
     @Transactional
     public SlideResponse update(UpdateSlideRequest request, MultipartFile file, long slideId, long moduleId) throws IOException {
-        ModuleSlide link = getSlideBySlideIdAndModuleId(slideId, moduleId);
+        Slide slide = getSlideBySlideIdAndModuleId(slideId, moduleId);
 
         String oldFileName = null;
-        if (link.getSlide().getPayload() != null && link.getSlide().getPayload().has("filename")) {
-            oldFileName = link.getSlide().getPayload().get("filename").asText();
+        if (slide.getPayload() != null && slide.getPayload().has("filename")) {
+            oldFileName = slide.getPayload().get("filename").asText();
         }
 
         boolean fileWasUpdated = false;
@@ -114,10 +115,10 @@ class SlideService {
             fileWasUpdated = true;
         }
 
-        link.getSlide().setTitle(request.title());
-        link.getSlide().setDescription(request.description());
-        link.getSlide().setSlideType(request.slideType());
-        link.getSlide().setPayload(newPayload);
+        slide.setTitle(request.title());
+        slide.setDescription(request.description());
+        slide.setSlideType(request.slideType());
+        slide.setPayload(newPayload);
 
         if (fileWasUpdated && oldFileName != null) {
             try {
@@ -128,7 +129,7 @@ class SlideService {
         }
 
 
-        return slideMapper.toResponse(link.getSlide());
+        return slideMapper.toResponse(slide);
     }
 
     @Transactional
@@ -171,6 +172,26 @@ class SlideService {
         moduleRepository.save(module);
     }
 
+    @Transactional
+    public Boolean checkOption(long slideId, long moduleId, Long selectedOptionId) {
+        Slide slide = getSlideBySlideIdAndModuleId(slideId, moduleId);
+        JsonNode payload = slide.getPayload();
+
+        if (payload == null || payload.get("output") == null) {
+            throw new RuntimeException("Test payload invalid");
+        }
+
+        Long outputId = payload.get("output").asLong();
+
+        if (!outputId.equals(selectedOptionId)) {
+            updateIsRight(slide,false);
+            return false;
+        }
+
+        updateIsRight(slide,true);
+        return true;
+    }
+
     private ModuleSlide findLink(Long slideId, Module module) {
         return module.getSlides().stream()
                 .filter(ms -> ms.getSlide().getId().equals(slideId))
@@ -178,14 +199,15 @@ class SlideService {
                 .orElseThrow(() -> new RuntimeException("Slide not found in this module"));
     }
 
-    private ModuleSlide getSlideBySlideIdAndModuleId(Long slideId, Long moduleId) {
-        Module module = moduleRepository.findById(moduleId)
+    private Slide getSlideBySlideIdAndModuleId(Long slideId, Long moduleId) {
+        Module module = moduleRepository.findByIdWithSlides(moduleId)
                 .orElseThrow(() -> new RuntimeException("Module not found"));
 
-        return module.getSlides().stream()
+        ModuleSlide moduleSlide = module.getSlides().stream()
                 .filter(ms -> ms.getSlide().getId().equals(slideId))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("Slide not found in this module"));
+        return moduleSlide.getSlide();
     }
 
     private JsonNode uploadFile(JsonNode payload, SlideType slideType, MultipartFile file) {
@@ -204,5 +226,17 @@ class SlideService {
                     .put("filename", filename);
         }
         return newPayload;
+    }
+
+    private void updateIsRight(Slide slide, Boolean right) {
+        JsonNode payload = slide.getPayload();
+
+        if (!(payload instanceof ObjectNode objectNode)) {
+            throw new IllegalStateException("Payload is not ObjectNode");
+        }
+
+        objectNode.put("is_right", right);
+
+        slide.setPayload(objectNode);
     }
 }

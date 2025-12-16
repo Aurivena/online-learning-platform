@@ -39,6 +39,11 @@ class SlideController {
         return Spond.success(slideService.findById(slideId, moduleId));
     }
 
+    @GetMapping(value = "/{slideId}/{selectedOptionId}", produces = "application/json")
+    public Spond<Boolean> checkOption(@PathVariable long slideId, @PathVariable Long moduleId, @PathVariable Long selectedOptionId) {
+        return Spond.success(slideService.checkOption(slideId,moduleId,selectedOptionId));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{slideId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public Spond<SlideResponse> update(
