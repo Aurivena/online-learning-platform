@@ -26,6 +26,11 @@ public class OrganizationService {
         Organization org = organizationMapper.toEntity(createOrganizationRequest);
         org.setOwner(owner);
 
+        Account account = accountService.getAccountByEmail(ownerEmail);
+
+        org.getMembers().add(account);
+        organizationRepository.save(org);
+
         return organizationMapper.toResponse(organizationRepository.save(org));
     }
 
