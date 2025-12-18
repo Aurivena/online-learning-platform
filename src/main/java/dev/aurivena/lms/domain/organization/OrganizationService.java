@@ -35,7 +35,7 @@ public class OrganizationService {
     }
 
     @Transactional()
-    public Page<OrganizationResponse> search(String accountID, Pageable pageable) {
+    public Page<OrganizationResponse> search(Long accountID, Pageable pageable) {
         return organizationRepository.search(accountID, pageable).map(organizationMapper::toResponse);
     }
 

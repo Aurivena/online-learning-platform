@@ -29,8 +29,8 @@ public class OrganizationController {
 
     @Operation(summary = "Поиск организаций")
     @GetMapping(produces = "application/json")
-    public Spond<Page<OrganizationResponse>> search(@RequestParam(required = false) String accountID, Pageable pageable) {
-        return Spond.success(organizationService.search(accountID,pageable));
+    public Spond<Page<OrganizationResponse>> search(@RequestParam(name = "accountId", required = false) Long accountID, Pageable pageable) {
+        return Spond.success(organizationService.search(accountID, pageable));
     }
 
     @Operation(summary = "Получить организацию по тегу")

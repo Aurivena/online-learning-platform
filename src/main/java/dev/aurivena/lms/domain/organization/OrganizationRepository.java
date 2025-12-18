@@ -11,15 +11,13 @@ import java.util.Optional;
 
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {
     @Query("""
-        SELECT o FROM Organization o 
-        JOIN  o.members m
-        WHERE (:accountId IS NULL OR m.id = :accountId)
-    """)
-    Page<Organization> search(
-            @Param("accountId") String accountId,
-            Pageable pageable
-    );
+                SELECT DISTINCT o FROM Organization o 
+                LEFT JOIN o.members m
+                WHERE :accountId IS NULL OR m.id = :accountId
+            """)
+    Page<Organization> search(@Param("accountId") Long accountId, Pageable pageable);
 
     Optional<Organization> findByTag(String tag);
+
     Optional<Organization> findById(Long id);
 }
